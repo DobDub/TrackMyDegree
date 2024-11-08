@@ -88,13 +88,29 @@ const TimelinePage = () => {
     return false;
   };
 
+  const getCourseById = (id, courses) => {
+    for (const courseSection of courses) {
+      if (courseSection.courseList) {
+        for (const course of courseSection.courseList) {
+          if (course.id === id) {
+            return course;
+          }
+        }
+      }
+      // Check for any nested subcourses and recursively search through them
+      if (courseSection.subcourses) {
+        const found = getCourseById(id, courseSection.subcourses);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
   const handleDragStart = (event) => {
     setReturning(false);
     const id = String(event.active.id);
-
-    const course = soenCourses
-      .flatMap(courseSection => courseSection.courseList)
-      .find(c => c.id === id);
+    
+    const course = getCourseById(id, soenCourses);
 
     if (course) {
       setSelectedCourse(course);
@@ -203,6 +219,36 @@ const TimelinePage = () => {
                         );
                       })}
                     </Container>
+                    {courseSection.subcourses !== undefined &&
+                      <Container style={{ padding: '5px 10px'}}>
+                        {courseSection.subcourseTitle}
+                        {courseSection.subcourses.map((innerCourseSection) => (
+                          <Accordion.Item eventKey={innerCourseSection.title} key={innerCourseSection.title}>
+                            <Accordion.Header>
+                              {innerCourseSection.title}
+                            </Accordion.Header>
+                            <Accordion.Body>
+                              <Container>
+                                {innerCourseSection.courseList.map((innerCourse) => {
+                                  const assigned = isCourseAssigned(innerCourse.id);
+                                  const isCurrentlyDragging = activeId === innerCourse.id;
+                                  return (
+                                    <Draggable
+                                      key={`${innerCourse.id}-${assigned}`} // Include 'assigned' in the key
+                                      id={innerCourse.id}
+                                      title={innerCourse.id}
+                                      disabled={assigned}
+                                      isDragging={isCurrentlyDragging}
+                                      isReturning={returning}
+                                    />
+                                  );
+                                })}
+                              </Container>
+                            </Accordion.Body>
+                          </Accordion.Item>
+                        ))}
+                      </Container>
+                    }
                   </Accordion.Body>
                 </Accordion.Item>
               ))}
@@ -213,12 +259,10 @@ const TimelinePage = () => {
         <div className="semesters-and-description">
           <div className="semesters">
             {semesters.map((semester) => (
-              <div key={semester.id} className="semester">
+              <Droppable key={semester.id} id={semester.id}>
                 <h3>{semester.name}</h3>
                 {semesterCourses[semester.id].map((courseId) => {
-                  const course = soenCourses
-                    .flatMap(courseSection => courseSection.courseList)
-                    .find(c => c.id === courseId);
+                  const course = getCourseById(courseId, soenCourses);
                   if (!course) return null;
                   const isCurrentlyDragging = activeId === course.id;
                   return (
@@ -250,9 +294,7 @@ const TimelinePage = () => {
       <DragOverlay dropAnimation={returning ? null : undefined}>
         {activeId ? (
           <div className="course-item-overlay">
-            {soenCourses
-              .flatMap(courseSection => courseSection.courseList)
-              .find(course => course.id === activeId)?.id}
+            {getCourseById(activeId, soenCourses)?.id}
           </div>
         ) : null}
       </DragOverlay>

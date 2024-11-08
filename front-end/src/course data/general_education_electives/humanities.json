@@ -1,5 +1,6 @@
 [
 	{
+		"id": "ARTH 353",
 		"title": "ARTH 353 Technology and Contemporary Art",
 		"credits": 3,
 		"prerequisites": "",
@@ -9,6 +10,7 @@
 		"notes": ""
 	},
 	{
+		"id": "ARTH 354",
 		"title": "ARTH 354 Studies in Interdisciplinarity in the Visual Arts",
 		"credits": 3,
 		"prerequisites": "",
@@ -18,6 +20,7 @@
 		"notes": ""
 	},
 	{
+		"id": "COMS 360",
 		"title": "COMS 360 Mass Media",
 		"credits": 3,
 		"prerequisites": "",
@@ -27,6 +30,7 @@
 		"notes": ""
 	},
 	{
+		"id": "ENGL 224",
 		"title": "ENGL 224 The Creative Process",
 		"credits": 3,
 		"prerequisites": "",
@@ -36,6 +40,7 @@
 		"notes": "This course does not count for credit in any Creative Writing program (Major, Minor, Honours in English and Creative Writing)"
 	},
 	{
+		"id": "ENGL 233",
 		"title": "ENGL 233 Critical Reading (3.00)",
 		"credits": 3,
 		"prerequisites": "",
@@ -45,6 +50,7 @@
 		"notes": ""
 	},
 	{
+		"id": "FLIT 240",
 		"title": "FLIT 240 Introduction aux littératures et aux cultures de la Francophonie (3.00)",
 		"credits": 3,
 		"prerequisites": "Le cours suivant doit être complété au préalable: FRAN 301 ou FRAN 303 ou l’équivalent.",
@@ -54,6 +60,7 @@
 		"notes": "Ce cours est réservé aux étudiantes et étudiants ayant effectué leurs études secondaires dans une langue autre que le français."
 	},
 	{
+		"id": "FMST 214",
 		"title": "FMST 214 Canadian Cinema (3.00)",
 		"credits": 3,
 		"prerequisites": "",
@@ -63,6 +70,7 @@
 		"notes": ""
 	},
 	{
+		"id": "FMST 215",
 		"title": "FMST 215 Le cinéma québécois (3.00)",
 		"credits": 3,
 		"prerequisites": "",
@@ -72,6 +80,7 @@
 		"notes": "Ce cours peut, à l’occasion, être offert en anglais. / This course may occasionally be taught in English."
 	},
 	{
+		"id": "HIST 202",
 		"title": "HIST 202 Modern Europe (3.00)",
 		"credits": 3,
 		"prerequisites": "",
@@ -81,6 +90,7 @@
 		"notes": "Students who have received credit for HISW 202 may not take this course for credit."
 	},
 	{
+		"id": "HIST 205",
 		"title": "HIST 205 History of Canada, Post‑Confederation (3.00)",
 		"credits": 3,
 		"prerequisites": "",
@@ -90,6 +100,7 @@
 		"notes": "Students who have received credit for HISW 205 or SCPA 205 may not take this course for credit."
 	},
 	{
+		"id": "HIST 281",
 		"title": "HIST 281 Film in History (3.00)",
 		"credits": 3,
 		"prerequisites": "",
@@ -99,6 +110,7 @@
 		"notes": "Students who have received credit for HISW 281 or this topic under a HIST 298 number may not take this course for credit."
 	},
 	{
+		"id": "HIST 283",
 		"title": "HIST 283 The 20th Century: A Global History (3.00)",
 		"credits": 3,
 		"prerequisites": "",
@@ -108,6 +120,7 @@
 		"notes": "Students who have received credit for HISW 283, LOYC 210, or for this topic under a HIST 298 number may not take this course for credit."
 	},
 	{
+		"id": "LBCL 201",
 		"title": "LBCL 201 Great Books: Western History and Thought from Antiquity through the Renaissance (3.00)",
 		"credits": 3,
 		"prerequisites": "",
@@ -117,6 +130,7 @@
 		"notes": "Students who have received credit for LBCL 291 or LBCL 292 may not take this course for credit."
 	},
 	{
+		"id": "LBCL 202",
 		"title": "LBCL 202 Great Books: Western Culture and Expression from Antiquity through the Renaissance",
 		"credits": 3,
 		"prerequisites": "",
@@ -126,6 +140,7 @@
 		"notes": "Students who have received credit for LBCL 291 or LBCL 292 may not take this course for credit."
 	},
 	{
+		"id": "LBCL 203",
 		"title": "LBCL 203 Great Books: Western History and Thought from the Reformation through Modernity",
 		"credits": 3,
 		"prerequisites": "",
@@ -135,6 +150,7 @@
 		"notes": "Students who have received credit for LBCL 291 or LBCL 292 may not take this course for credit."
 	},
 	{
+		"id": "LBCL 204",
 		"title": "LBCL 204 Great Books: Western Culture and Expression from the Reformation through Modernity",
 		"credits": 3,
 		"prerequisites": "",
@@ -144,6 +160,7 @@
 		"notes": "Students who have received credit for LBCL 291 or LBCL 292 may not take this course for credit."
 	},
 	{
+		"id": "PHIL 201",
 		"title": "PHIL 201 Problems of Philosophy",
 		"credits": 3,
 		"prerequisites": "",
@@ -153,6 +170,7 @@
 		"notes": ""
 	},
 	{
+		"id": "PHIL 232",
 		"title": "PHIL 232 Introduction to Ethics",
 		"credits": 3,
 		"prerequisites": "",
@@ -162,6 +180,7 @@
 		"notes": ""
 	},
 	{
+		"id": "PHIL 233",
 		"title": "PHIL 233 Applied Ethics",
 		"credits": 3,
 		"prerequisites": "",
@@ -171,6 +190,7 @@
 		"notes": "Students who have received credit for this topic under a PHIL 298 number may not take this course for credit."
 	},
 	{
+		"id": "PHIL 235",
 		"title": "PHIL 235 Biomedical Ethics",
 		"credits": 3,
 		"prerequisites": "",
@@ -180,6 +200,7 @@
 		"notes": ""
 	},
 	{
+		"id": "PHIL 275",
 		"title": "PHIL 275 From Modern to Postmodern: Philosophical Thought and Cultural Critique",
 		"credits": 3,
 		"prerequisites": "",
@@ -189,6 +210,7 @@
 		"notes": ""
 	},
 	{
+		"id": "PHIL 330",
 		"title": "PHIL 330 Contemporary Ethical Theory",
 		"credits": 3,
 		"prerequisites": " PHIL 232 or PHIL 233 or PHIL 235 or PHIL 236 or PHIL 241",
@@ -198,6 +220,7 @@
 		"notes": "Students who have received credit for this topic under a PHIL 398 number may not take this course for credit."
 	},
 	{
+		"id": "THEO 202",
 		"title": "THEO 202 Introduction to Biblical Studies",
 		"credits": 3,
 		"prerequisites": "",
@@ -207,6 +230,7 @@
 		"notes": ""
 	},
 	{
+		"id": "THEO 204",
 		"title": "THEO 204 Introduction to Christian Ethics",
 		"credits": 3,
 		"prerequisites": "",
@@ -216,6 +240,7 @@
 		"notes": ""
 	},
 	{
+		"id": "THEO 233",
 		"title": "THEO 233 Religious Pluralism in a Secular Culture",
 		"credits": 3,
 		"prerequisites": "",
