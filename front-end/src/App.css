@@ -387,10 +387,23 @@
 }
 
 .credits-display {
-  padding: 10px;
-  background-color: #f5f5f5;
+  /* padding: 10px; */
   text-align: center;
+  margin-top: 10px;
   margin-bottom: 10px;
+  display: flex;
+  justify-content:center;
+  align-items: center;
+  gap: 100px;
+  width: 80%;
+}
+
+.center {
+  background-color: #f5f5f5;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .credits-display h4 {
@@ -398,17 +411,28 @@
 }
 
 .save-button {
-  margin-top: 10px;
-  padding: 8px 16px;
-  background-color: #28a745;
+  /* margin-top: 10px; */
+  /* padding: 8px 16px; */
+  /* background-color: #8ac297; */
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: ease 0.1s;
 }
 
-.save-button:hover {
-  background-color: #218838;
+/* .save-button:hover {
+  background-color: #91233754;
+} */
+
+.save-button img {
+  width: 30px;
+  /* margin-right: 5px; */
+  transition: ease 0.1s;
+}
+
+.save-button img:hover {
+  transform: scale(1.05);
 }
 
 .warning-icon {
