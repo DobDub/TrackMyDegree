@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import fs from 'fs'; // Import fs module
 import {
   DndContext,
   useDraggable,
@@ -18,8 +19,8 @@ import { CSS } from '@dnd-kit/utilities';
 import Accordion from 'react-bootstrap/Accordion';
 import Container from 'react-bootstrap/Container';
 import soenCourses from '../course data/soen_courses';
-// import { FaExclamationTriangle } from 'react-icons/fa'; // Import warning icon
 import warningIcon from '../icons/warning.png'; // Import warning icon
+
 // Semesters are currently hard-coded
 const semesters = [
   { id: 'fall2024', name: 'Fall 2024' },
@@ -178,324 +179,373 @@ const TimelinePage = () => {
     return false;
   };
 
-  const handleDragStart = (event) => {
-    setReturning(false);
-    const id = String(event.active.id);
+  // Save Handler
+  const handleSave = () => {
+    const fs = require('fs');
+    const savedState = JSON.stringify(semesterCourses);
+    // localStorage.setItem('savedSemesterCourses', savedState);
+    fs.writeFile("data.json", savedState, (error) => {
+      // throwing the error
+      // in case of a writing problem
+      if (error) {
+        // logging the error
+        console.error(error);
 
-    const course = soenCourses
-      .flatMap((courseSection) => courseSection.courseList)
-      .find((c) => c.id === id);
-
-    if (course) {
-      setSelectedCourse(course);
-    }
-
-    document.querySelector('.semesters')?.classList.add('no-scroll');
-
-    setActiveId(id);
-  };
-
-  const findSemesterIdByCourseId = (courseId, semesters) => {
-    for (const semesterId in semesters) {
-      if (semesters[semesterId].includes(courseId)) {
-        return semesterId;
+        throw error;
       }
-    }
-    return null;
-  };
-
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-    const id = String(active.id);
-
-    if (over) {
-      if (over.id === 'courseList') {
-        // Course is being returned to the course list
-        handleReturn(id);
-      } else {
-        setSemesterCourses((prevSemesters) => {
-          const updatedSemesters = { ...prevSemesters };
-          const activeSemesterId = findSemesterIdByCourseId(
-            id,
-            prevSemesters
-          );
-          let overSemesterId;
-          let overIndex;
-
-          if (over.data.current?.type === 'semester') {
-            // Dropped over a semester (empty space)
-            overSemesterId = over.data.current.containerId;
-            overIndex = updatedSemesters[overSemesterId].length;
-          } else if (over.data.current?.type === 'course') {
-            // Dropped over a course in a semester
-            overSemesterId = over.data.current.containerId;
-            overIndex = updatedSemesters[overSemesterId].indexOf(over.id);
-
-            if (id === over.id) {
-              // Dropped back onto itself; do nothing
-              return prevSemesters;
-            }
-          } else {
-            // Fallback
-            overSemesterId = findSemesterIdByCourseId(over.id, prevSemesters);
-            overIndex = updatedSemesters[overSemesterId]?.indexOf(over.id);
-          }
-
-          if (activeSemesterId) {
-            // Remove from old semester
-            updatedSemesters[activeSemesterId] = updatedSemesters[
-              activeSemesterId
-            ].filter((courseId) => courseId !== id);
-          }
-
-          if (overSemesterId) {
-            // Insert into new semester
-            updatedSemesters[overSemesterId].splice(overIndex, 0, id);
-          }
-
-          return updatedSemesters;
-        });
-      }
-    }
-
-    setActiveId(null);
-    document.querySelector('.semesters')?.classList.remove('no-scroll');
-  };
-
-  const handleDragCancel = () => {
-    setActiveId(null);
-    document.querySelector('.semesters')?.classList.remove('no-scroll');
-  };
-
-  const handleReturn = (courseId) => {
-    setReturning(true);
-
-    setSemesterCourses((prevSemesters) => {
-      const updatedSemesters = { ...prevSemesters };
-      for (const semesterId in updatedSemesters) {
-        updatedSemesters[semesterId] = updatedSemesters[semesterId].filter(
-          (id) => id !== courseId
-        );
-      }
-      return updatedSemesters;
+      console.log("data.json written correctly");
     });
   };
 
-  const handleCourseSelect = (id) => {
-    const course = soenCourses
-      .flatMap((courseSection) => courseSection.courseList)
-      .find((c) => c.id === id);
-    if (course) {
-      setSelectedCourse(course);
-    }
-  };
+    const handleDragStart = (event) => {
+      setReturning(false);
+      const id = String(event.active.id);
 
-  // Calculate total credits whenever semesterCourses changes
-  useEffect(() => {
-    const calculateTotalCredits = () => {
-      let total = 0;
-      let unmetPrereqFound = false;
+      const course = soenCourses
+        .flatMap((courseSection) => courseSection.courseList)
+        .find((c) => c.id === id);
 
-      for (const semesterId in semesterCourses) {
-        const courseIds = semesterCourses[semesterId];
-        const currentSemesterIndex = semesters.findIndex(
-          (s) => s.id === semesterId
-        );
-
-        courseIds.forEach((courseId) => {
-          const course = soenCourses
-            .flatMap((courseSection) => courseSection.courseList)
-            .find((c) => c.id === courseId);
-
-          if (course && course.credits) {
-            const prerequisitesMet = arePrerequisitesMet(
-              courseId,
-              currentSemesterIndex
-            );
-
-            if (prerequisitesMet) {
-              total += course.credits;
-            } else {
-              unmetPrereqFound = true;
-            }
-          }
-        });
+      if (course) {
+        setSelectedCourse(course);
       }
 
-      setTotalCredits(total);
-      setHasUnmetPrerequisites(unmetPrereqFound);
+      document.querySelector('.semesters')?.classList.add('no-scroll');
+
+      setActiveId(id);
     };
 
-    calculateTotalCredits();
-  }, [semesterCourses]);
+    const findSemesterIdByCourseId = (courseId, semesters) => {
+      for (const semesterId in semesters) {
+        if (semesters[semesterId].includes(courseId)) {
+          return semesterId;
+        }
+      }
+      return null;
+    };
 
+    const handleDragEnd = (event) => {
+      const { active, over } = event;
+      const id = String(active.id);
 
-  // Function to check if prerequisites are met
-  const arePrerequisitesMet = (courseId, currentSemesterIndex) => {
-    const course = soenCourses
-      .flatMap((courseSection) => courseSection.courseList)
-      .find((c) => c.id === courseId);
+      if (over) {
+        if (over.id === 'courseList') {
+          // Course is being returned to the course list
+          handleReturn(id);
+        } else {
+          setSemesterCourses((prevSemesters) => {
+            const updatedSemesters = { ...prevSemesters };
+            const activeSemesterId = findSemesterIdByCourseId(id, prevSemesters);
+            let overSemesterId;
+            let overIndex;
 
-    if (!course || !course.prerequisites || course.prerequisites.length === 0) {
-      // No prerequisites, so they are met by default
-      return true;
-    }
+            if (over.data.current?.type === 'semester') {
+              // Dropped over a semester (empty space)
+              overSemesterId = over.data.current.containerId;
+              overIndex = updatedSemesters[overSemesterId].length;
+            } else if (over.data.current?.type === 'course') {
+              // Dropped over a course in a semester
+              overSemesterId = over.data.current.containerId;
+              overIndex = updatedSemesters[overSemesterId].indexOf(over.id);
 
-    // Collect all courses scheduled in semesters before the current one
-    const scheduledCourses = [];
-    for (let i = 0; i < currentSemesterIndex; i++) {
-      const semesterId = semesters[i].id;
-      scheduledCourses.push(...semesterCourses[semesterId]);
-    }
+              if (id === over.id) {
+                // Dropped back onto itself; do nothing
+                return prevSemesters;
+              }
+            } else {
+              // Fallback
+              overSemesterId = findSemesterIdByCourseId(over.id, prevSemesters);
+              overIndex = updatedSemesters[overSemesterId]?.indexOf(over.id);
+            }
 
-    // Check if all prerequisites are in the scheduled courses
-    return course.prerequisites.every((prereqId) =>
-      scheduledCourses.includes(prereqId)
-    );
-  };
+            if (activeSemesterId) {
+              // Remove from old semester
+              updatedSemesters[activeSemesterId] = updatedSemesters[
+                activeSemesterId
+              ].filter((courseId) => courseId !== id);
+            }
 
-  return (
-    <DndContext
-      sensors={sensors}
-      collisionDetection={closestCorners}
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
-      onDragCancel={handleDragCancel}
-    >
-      {/* Total Credits Display */}
-      <div className="credits-display">
-        <h4 style={{ color: hasUnmetPrerequisites ? 'red' : 'inherit' }}>
-          Total Credits Earned: {totalCredits} / 120
-        </h4>
-      </div>
+            if (overSemesterId) {
+              // Insert into new semester
+              updatedSemesters[overSemesterId].splice(overIndex, 0, id);
+            }
 
-      <div className="timeline-page">
+            return updatedSemesters;
+          });
+        }
+      }
 
+      setActiveId(null);
+      document.querySelector('.semesters')?.classList.remove('no-scroll');
+    };
 
-        <div className="timeline-left-bar">
-          <h3>Course List</h3>
-          <Droppable id="courseList" className="course-list">
-            <Accordion>
-              {soenCourses.map((courseSection) => (
-                <Accordion.Item
-                  eventKey={courseSection.title}
-                  key={courseSection.title}
-                >
-                  <Accordion.Header>{courseSection.title}</Accordion.Header>
-                  <Accordion.Body>
-                    <Container>
-                      {courseSection.courseList.map((course) => {
-                        const assigned = isCourseAssigned(course.id);
+    const handleDragCancel = () => {
+      setActiveId(null);
+      document.querySelector('.semesters')?.classList.remove('no-scroll');
+    };
+
+    const handleReturn = (courseId) => {
+      setReturning(true);
+
+      setSemesterCourses((prevSemesters) => {
+        const updatedSemesters = { ...prevSemesters };
+        for (const semesterId in updatedSemesters) {
+          updatedSemesters[semesterId] = updatedSemesters[semesterId].filter(
+            (id) => id !== courseId
+          );
+        }
+        return updatedSemesters;
+      });
+    };
+
+    const handleCourseSelect = (id) => {
+      const course = soenCourses
+        .flatMap((courseSection) => courseSection.courseList)
+        .find((c) => c.id === id);
+      if (course) {
+        setSelectedCourse(course);
+      }
+    };
+
+    // Load saved state on initial render
+    useEffect(() => {
+      const loadSavedState = () => {
+        try {
+          const savedState = localStorage.getItem('savedSemesterCourses');
+          if (savedState) {
+            setSemesterCourses(JSON.parse(savedState));
+          }
+        } catch (error) {
+          console.error('Error loading saved schedule:', error);
+        }
+      };
+
+      loadSavedState();
+    }, []);
+
+    // Calculate total credits and check for unmet prerequisites whenever semesterCourses changes
+    useEffect(() => {
+      const calculateTotalCredits = () => {
+        let total = 0;
+        let unmetPrereqFound = false;
+
+        for (const semesterId in semesterCourses) {
+          const courseIds = semesterCourses[semesterId];
+          const currentSemesterIndex = semesters.findIndex(
+            (s) => s.id === semesterId
+          );
+
+          courseIds.forEach((courseId) => {
+            const course = soenCourses
+              .flatMap((courseSection) => courseSection.courseList)
+              .find((c) => c.id === courseId);
+
+            if (course && course.credits) {
+              const prerequisitesMet = arePrerequisitesMet(
+                courseId,
+                currentSemesterIndex
+              );
+
+              if (prerequisitesMet) {
+                total += course.credits;
+              } else {
+                unmetPrereqFound = true;
+              }
+            }
+          });
+        }
+
+        setTotalCredits(total);
+        setHasUnmetPrerequisites(unmetPrereqFound);
+      };
+
+      calculateTotalCredits();
+    }, [semesterCourses]);
+
+    // Function to check if prerequisites are met
+    const arePrerequisitesMet = (courseId, currentSemesterIndex) => {
+      const course = soenCourses
+        .flatMap((courseSection) => courseSection.courseList)
+        .find((c) => c.id === courseId);
+
+      if (!course) {
+        console.warn(`Course with ID ${courseId} not found.`);
+        return true;
+      }
+
+      // Normalize prerequisites
+      const prerequisites = Array.isArray(course.prerequisites)
+        ? course.prerequisites
+        : course.prerequisites
+          ? [course.prerequisites]
+          : [];
+
+      if (prerequisites.length === 0) {
+        // No prerequisites, so they are met by default
+        return true;
+      }
+
+      // Collect all courses scheduled in semesters before the current one
+      const scheduledCourses = [];
+      for (let i = 0; i < currentSemesterIndex; i++) {
+        const semesterId = semesters[i].id;
+        scheduledCourses.push(...semesterCourses[semesterId]);
+      }
+
+      // Check if all prerequisites are in the scheduled courses
+      return prerequisites.every((prereqId) =>
+        scheduledCourses.includes(prereqId)
+      );
+    };
+
+    return (
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragStart={handleDragStart}
+        onDragEnd={handleDragEnd}
+        onDragCancel={handleDragCancel}
+      >
+        {/* Total Credits Display with Save Button */}
+        <div className="credits-display">
+          <h4 style={{ color: hasUnmetPrerequisites ? 'red' : 'inherit' }}>
+            Total Credits Earned: {totalCredits} / 120
+          </h4>
+          <button onClick={handleSave} className="save-button">
+            Save Schedule
+          </button>
+        </div>
+        <div className="timeline-page">
+          <div className="timeline-left-bar">
+            <h3>Course List</h3>
+            <Droppable id="courseList" className="course-list">
+              <Accordion alwaysOpen>
+                {soenCourses.map((courseSection) => (
+                  <Accordion.Item
+                    eventKey={courseSection.title}
+                    key={courseSection.title}
+                  >
+                    <Accordion.Header>{courseSection.title}</Accordion.Header>
+                    <Accordion.Body>
+                      <Container>
+                        {courseSection.courseList.map((course) => {
+                          const assigned = isCourseAssigned(course.id);
+                          const isSelected = selectedCourse?.id === course.id;
+
+                          return (
+                            <DraggableCourse
+                              key={`${course.id}-${assigned}`} // Include assigned in key
+                              id={course.id}
+                              title={course.id}
+                              disabled={assigned}
+                              isReturning={returning}
+                              isSelected={isSelected}
+                              onSelect={handleCourseSelect}
+                              containerId="courseList"
+                            />
+                          );
+                        })}
+                      </Container>
+                    </Accordion.Body>
+                  </Accordion.Item>
+                ))}
+              </Accordion>
+            </Droppable>
+          </div>
+
+          <div className="semesters-and-description">
+            <div className="semesters">
+              {semesters.map((semester, index) => (
+                <div key={semester.id} className="semester">
+                  <h3>{semester.name}</h3>
+                  <Droppable id={semester.id}>
+                    <SortableContext
+                      items={semesterCourses[semester.id]}
+                      strategy={verticalListSortingStrategy}
+                    >
+                      {semesterCourses[semester.id].map((courseId) => {
+                        const course = soenCourses
+                          .flatMap((courseSection) => courseSection.courseList)
+                          .find((c) => c.id === courseId);
+                        if (!course) return null;
                         const isSelected = selectedCourse?.id === course.id;
+                        const isDraggingFromSemester = activeId === course.id;
+
+                        // Check if prerequisites are met
+                        const prerequisitesMet = arePrerequisitesMet(
+                          courseId,
+                          index
+                        );
 
                         return (
-                          <DraggableCourse
-                            key={`${course.id}-${assigned}`} // Include assigned in key
+                          <SortableCourse
+                            key={course.id}
                             id={course.id}
                             title={course.id}
-                            disabled={assigned}
-                            isReturning={returning}
+                            disabled={false}
                             isSelected={isSelected}
+                            isDraggingFromSemester={isDraggingFromSemester}
                             onSelect={handleCourseSelect}
-                            containerId="courseList"
+                            containerId={semester.id}
+                            prerequisitesMet={prerequisitesMet} // Pass the prop
                           />
                         );
                       })}
-                    </Container>
-                  </Accordion.Body>
-                </Accordion.Item>
+                    </SortableContext>
+                  </Droppable>
+                </div>
               ))}
-            </Accordion>
-          </Droppable>
-        </div>
-
-        <div className="semesters-and-description">
-          <div className="semesters">
-            {semesters.map((semester, index) => (
-              <div key={semester.id} className="semester">
-                <h3>{semester.name}</h3>
-                <Droppable id={semester.id}>
-                  <SortableContext
-                    items={semesterCourses[semester.id]}
-                    strategy={verticalListSortingStrategy}
-                  >
-                    {semesterCourses[semester.id].map((courseId) => {
-                      const course = soenCourses
-                        .flatMap((courseSection) => courseSection.courseList)
-                        .find((c) => c.id === courseId);
-                      if (!course) return null;
-                      const isSelected = selectedCourse?.id === course.id;
-                      const isDraggingFromSemester = activeId === course.id;
-
-                      // Check if prerequisites are met
-                      const prerequisitesMet = arePrerequisitesMet(courseId, index);
-
-                      return (
-                        <SortableCourse
-                          key={course.id}
-                          id={course.id}
-                          title={course.id}
-                          disabled={false}
-                          isSelected={isSelected}
-                          isDraggingFromSemester={isDraggingFromSemester}
-                          onSelect={handleCourseSelect}
-                          containerId={semester.id}
-                          prerequisitesMet={prerequisitesMet} // Pass the prop
-                        />
-                      );
-                    })}
-                  </SortableContext>
-                </Droppable>
-              </div>
-            ))}
-          </div>
-          <div className="description-space">
-            {selectedCourse ? (
-              <div>
-                <h3>{selectedCourse.title}</h3>
-                <p data-testid='course-description'>{selectedCourse.description}</p>
-                {selectedCourse.prerequisites && selectedCourse.prerequisites.length > 0 && (
-                  <div>
-                    <h4>Prerequisites:</h4>
-                    <ul>
-                      {selectedCourse.prerequisites.map((prereqId) => {
-                        const prereqCourse = soenCourses
-                          .flatMap((courseSection) => courseSection.courseList)
-                          .find((c) => c.id === prereqId);
-                        return (
-                          <li key={prereqId} >
-                            {prereqCourse ? (
-                              <>
-                                {prereqCourse.id}
-                              </>
-                            ) : (
-                              prereqId
-                            )}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <p data-testid='course-description'>Drag or click on a course to see its description here.</p>
-            )}
-          </div>
-
-        </div>
-        <DragOverlay dropAnimation={returning ? null : undefined}>
-          {activeId ? (
-            <div className="course-item-overlay selected">
-              {soenCourses
-                .flatMap((courseSection) => courseSection.courseList)
-                .find((course) => course.id === activeId)?.id}
             </div>
-          ) : null}
-        </DragOverlay>
-      </div>
-    </DndContext>
-  );
-};
+            <div className="description-space">
+              {selectedCourse ? (
+                <div>
+                  <h3>{selectedCourse.title}</h3>
+                  <p data-testid="course-description">{selectedCourse.description}</p>
+                  {selectedCourse.prerequisites &&
+                    selectedCourse.prerequisites.length > 0 && (
+                      <div>
+                        <h4>Prerequisites:</h4>
+                        <ul>
+                          {selectedCourse.prerequisites.map((prereqId) => {
+                            const prereqCourse = soenCourses
+                              .flatMap(
+                                (courseSection) => courseSection.courseList
+                              )
+                              .find((c) => c.id === prereqId);
+                            return (
+                              <li key={prereqId}>
+                                {prereqCourse ? (
+                                  <>
+                                    {prereqCourse.id} - {prereqCourse.title}
+                                  </>
+                                ) : (
+                                  prereqId
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      </div>
+                    )}
+                </div>
+              ) : (
+                <p data-testid="course-description">
+                  Drag or click on a course to see its description here.
+                </p>
+              )}
+            </div>
+          </div>
+          <DragOverlay dropAnimation={returning ? null : undefined}>
+            {activeId ? (
+              <div className="course-item-overlay selected">
+                {soenCourses
+                  .flatMap((courseSection) => courseSection.courseList)
+                  .find((course) => course.id === activeId)?.id}
+              </div>
+            ) : null}
+          </DragOverlay>
+        </div>
+      </DndContext>
+    );
+  };
 
-export default TimelinePage;
+  export default TimelinePage;
