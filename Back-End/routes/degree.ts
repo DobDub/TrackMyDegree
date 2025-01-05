@@ -117,12 +117,11 @@ router.post('/degree/create', async (req: Request, res: Response) => {
       }
   
       // Call the service function
-      const newDegree = await degreeController.deleteDegree(id);
+      await degreeController.deleteDegree(id);
   
       // Send success response
       res.status(HTTP.OK).json({
         message: 'Degree deleted successfully.',
-        degree: newDegree,
       });
     } catch (error) {
       // Handle errors from the service
