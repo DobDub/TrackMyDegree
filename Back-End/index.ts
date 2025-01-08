@@ -9,6 +9,8 @@ import HTTP from "@Util/HTTPCodes";
 import authRouter from "@routes/auth";
 import coursesRouter from "@routes/courses";
 import degreeRouter from "@routes/degree"
+import appUserRouter from "@routes/appUser"
+import deficiencyRouter from "@routes/deficiency"
 
 //Dev Consts
 const HOPPSCOTCH = "chrome-extension://amknoiejhlmhancpahfcfcfhllgkpbld";
@@ -29,6 +31,8 @@ app.use(cors({ origin: [HOPPSCOTCH, CLIENT, "*"] }));
 app.use("/auth", authRouter);
 app.use("/courses", coursesRouter);
 app.use("/degree", degreeRouter);
+app.use("/appUser", appUserRouter);
+app.use("/deficiency", deficiencyRouter);
 
 /**
  * DB test route
