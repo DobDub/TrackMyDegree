@@ -4,7 +4,7 @@ import deficiencyController from "@controllers/deficiencyController/deficiencyCo
 
 const router = express.Router();
 
-router.post('/deficiency/create', async (req: Request, res: Response) => {
+router.post('/create', async (req: Request, res: Response) => {
     const { id, coursepool, user_id, creditsRequired } = req.query
   
     try {
@@ -41,7 +41,7 @@ router.post('/deficiency/create', async (req: Request, res: Response) => {
   });
   
 
-  router.get('/deficiency/read', async (req: Request, res: Response) => {
+  router.get('/read', async (req: Request, res: Response) => {
     const { id } = req.query;
   
     try {
@@ -73,7 +73,7 @@ router.post('/deficiency/create', async (req: Request, res: Response) => {
     }
   });
 
-  router.get('/deficiency/update', async (req: Request, res: Response) => {
+  router.put('/update', async (req: Request, res: Response) => {
     const { id, coursepool, user_id, creditsRequired } = req.query;
   
     try {
@@ -108,7 +108,7 @@ router.post('/deficiency/create', async (req: Request, res: Response) => {
     }
   });
 
-  router.get('/deficiency/delete', async (req: Request, res: Response) => {
+  router.post('/delete', async (req: Request, res: Response) => {
     const { id } = req.query;
   
     try {

@@ -5,7 +5,7 @@ import appUserTypes from "@controllers/appUserController/appUser_types"
 
 const router = express.Router();
 
-  router.get('/appUser/update', async (req: Request, res: Response) => {
+  router.put('/update', async (req: Request, res: Response) => {
     const { id, email, password, firstname, lastname, degree, type } = req.query as {
         id: string;
         email: string;
@@ -50,7 +50,7 @@ const router = express.Router();
     }
   });
 
-  router.get('/appUser/delete', async (req: Request, res: Response) => {
+  router.post('/delete', async (req: Request, res: Response) => {
     const { id } = req.query;
   
     try {
