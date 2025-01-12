@@ -60,11 +60,11 @@ async function registerUser(userInfo: Auth.UserInfo)
         .input('id', Database.msSQL.VarChar, id)
         .input('email', Database.msSQL.VarChar, email)
         .input('password', Database.msSQL.VarChar, password)
-        .input('fullname', Database.msSQL.VarChar, fullname)
+        .input('name', Database.msSQL.VarChar, fullname)
         .input('type', Database.msSQL.VarChar, type)
-        .query('INSERT INTO AppUser ( id,  email,  password,  fullname,  type) \
+        .query('INSERT INTO AppUser ( id,  email,  password,  name,  type) \
               OUTPUT INSERTED.id                                         \
-                          VALUES  (@id, @email, @password, @fullname, @type)');
+                          VALUES  (@id, @email, @password, @name, @type)');
 
       if ((undefined) === (result.recordset)) {
         log("Error inserting record ", result.recordset);

@@ -1,10 +1,9 @@
 // src/components/Navbar.js
 import React, { useContext } from "react";
-import { useNavigate,  Link  } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import '../css/Navbar.css';
 
 const Navbar = () => {
   const { isLoggedIn, logout } = useContext(AuthContext);
@@ -20,8 +19,7 @@ const Navbar = () => {
     <nav className="navbar navbar-expand-lg custom-navbar custom-navbar-height custom-navbar-padding">
       <div className="container-fluid custom-navbar-left-align">
         <a className="navbar-brand custom-navbar-brand-left" href="/">
-          <span className="brand-text">TrackMyDegree 🎓</span>
-          <span className="brand-emoji">🎓</span>
+          TrackMyDegree
         </a>
         <button
           className="navbar-toggler"
@@ -39,37 +37,33 @@ const Navbar = () => {
             <a className="nav-link active" aria-current="page" href="/">
               Home
             </a>
-            <a className="nav-link" href="/timeline">
+
+            {isLoggedIn ? (
+              <>
+                <a className="nav-link" href="/user">
+                  User
+                </a>
+                <a className="nav-link" href="/timeline">
                   Timeline
-            </a>
+                </a>
+                {/* Add an empty link */}
+                <a className="nav-link">                      </a>
+                <a
+                  className="nav-link"
+                  onClick={handleLogout}
+                >
+                  Log Out
+                </a>
+              </>
+            ) : (
+              <a className="nav-link" href="/signin">
+                Log In
+              </a>
+            )}
             <a className="nav-link" href="/courselist">
               Course List
             </a>
-            {/* <a className="nav-link" href="/uploadTranscript">
-              Upload Transcript
-            </a> */}
           </div>
-            {isLoggedIn ? (
-              <>
-                <div className="navbar-right-buttons">
-                  <Link to="/user">
-                    <button className="navbar-button navbar-button-signin">User</button>
-                  </Link>
-                  <Link to="/signup">
-                    <button className="navbar-button navbar-button-register" onClick={handleLogout}>Log Out</button>
-                  </Link>
-                </div>
-              </>
-            ) : (
-              <div className="navbar-right-buttons">
-                <Link to="/signin">
-                  <button className="navbar-button navbar-button-signin">Sign in</button>
-                </Link>
-                <Link to="/signup">
-                  <button className="navbar-button navbar-button-register">Register</button>
-                </Link>
-              </div>
-            )}
         </div>
       </div>
     </nav>

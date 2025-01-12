@@ -7,8 +7,6 @@ import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 import Dropdown from "react-bootstrap/Dropdown";
 import CourseListAccordion from "../components/CourseListAccordion";
-import '../css/CourseListPage.css';
-
 
 const degrees = ['Software Engineering', 'Computer Engineering', 'Electrical Engineering'];
 
