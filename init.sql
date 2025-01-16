@@ -1,5 +1,5 @@
 CREATE TABLE Degree (
-  id VARCHAR(255) PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT (UUID()),
   name VARCHAR(255) UNIQUE NOT NULL,
   totalCredits INT NOT NULL
 );
@@ -12,21 +12,19 @@ CREATE TABLE Course (
 );
 
 CREATE TABLE Requisite (
-    id VARCHAR(255) PRIMARY KEY,
-    code1 VARCHAR(7),
-    code2 VARCHAR(7),
+    id UUID PRIMARY KEY DEFAULT (UUID()),
     type VARCHAR(3) CHECK (type IN ('pre', 'co')),
     FOREIGN KEY (code1) REFERENCES Course(code),
     FOREIGN KEY (code2) REFERENCES Course(code)
 );
 
 CREATE TABLE CoursePool (
-  id VARCHAR(255) PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT (UUID()),
   name VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE DegreeXCoursePool (
-  id VARCHAR(255) PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT (UUID()),
   degree VARCHAR(255),
   coursepool VARCHAR(255),
   creditsRequired INT NOT NULL,
@@ -36,7 +34,7 @@ CREATE TABLE DegreeXCoursePool (
 );
 
 CREATE TABLE CourseXCoursePool (
-  id VARCHAR(255) PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT (UUID()),
   coursecode VARCHAR(7),
   coursepool VARCHAR(255),
   UNIQUE(coursecode, coursepool),
@@ -45,7 +43,7 @@ CREATE TABLE CourseXCoursePool (
 );
 
 CREATE TABLE AppUser (  -- Use square brackets for reserved keywords
-    id VARCHAR(255) PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT (UUID()),
     email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     fullname VARCHAR(255) NOT NULL,
@@ -55,7 +53,7 @@ CREATE TABLE AppUser (  -- Use square brackets for reserved keywords
 );
 
 CREATE TABLE Timeline (
-    id VARCHAR(255) PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT (UUID()),
     season VARCHAR(10) CHECK (season IN ('fall', 'winter', 'summer1', 'summer2', 'fall/winter', 'summer')) NOT NULL,
     year INT NOT NULL,
     coursecode VARCHAR(7) NOT NULL,
@@ -66,7 +64,7 @@ CREATE TABLE Timeline (
 );
 
 CREATE TABLE Deficiency (
-    id VARCHAR(255) PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT (UUID()),
     coursepool VARCHAR(255),
     user_id VARCHAR(255),
     creditsRequired INT NOT NULL,
@@ -76,7 +74,7 @@ CREATE TABLE Deficiency (
 );
 
 CREATE TABLE Exemption (
-    id VARCHAR(255) PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT (UUID()),
     coursecode VARCHAR(7),
     user_id VARCHAR(255),
     UNIQUE(user_id, coursecode),
