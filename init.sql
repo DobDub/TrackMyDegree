@@ -16,9 +16,11 @@ CREATE TABLE Course (
 
 CREATE TABLE Requisite (
     id UUID PRIMARY KEY DEFAULT (UUID()),
+    code VARCHAR(7),
+    reqCode VARCHAR(7),
     type VARCHAR(3) CHECK (type IN ('pre', 'co')),
-    FOREIGN KEY (code1) REFERENCES Course(code),
-    FOREIGN KEY (code2) REFERENCES Course(code)
+    FOREIGN KEY (code) REFERENCES Course(code),
+    FOREIGN KEY (reqCode) REFERENCES Course(code)
 );
 
 CREATE TABLE CoursePool (
