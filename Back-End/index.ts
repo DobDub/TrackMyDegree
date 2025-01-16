@@ -11,6 +11,7 @@ import coursesRouter from "@routes/courses";
 import degreeRouter from "@routes/degree"
 import exemptionRouter from "@routes/exemption"
 import deficiencyRouter from "@routes/deficiency"
+import requisiteRouter from "@routes/requisite"
 
 //Dev Consts
 const HOPPSCOTCH = "chrome-extension://amknoiejhlmhancpahfcfcfhllgkpbld";
@@ -51,6 +52,7 @@ app.use("/courses", coursesRouter);
 app.use("/degree", degreeRouter);
 app.use("/exemption", exemptionRouter);
 app.use("/deficiency", deficiencyRouter);
+app.use("/requisite", requisiteRouter);
 
 /**
  * DB test route
