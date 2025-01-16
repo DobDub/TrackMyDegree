@@ -8,6 +8,9 @@ CREATE TABLE Course (
   code VARCHAR(7) NOT NULL,
   credits INT NOT NULL,
   description VARCHAR(255) NOT NULL,
+  title TEXT NOT NULL,
+  components TEXT NOT NULL,
+  notes TEXT,
   PRIMARY KEY (code)
 );
 
