@@ -125,22 +125,27 @@ VALUES ('Engineering Core'),
        ('Mathematics Electives: BCompSC'),
        ('General Electives: BCompSc');
 
--- Requisite table
-INSERT INTO Requisite (id, code1, code2, type)
-VALUES ('1', 'COMP335', 'SOEN363', 'pre'),  -- Database Systems requires Introduction to Programming
-       ('2', 'SOEN363', 'SOEN287', 'co');  -- Web Development requires Database Systems
+-- Insert into DegreeXCoursePool table
+INSERT INTO DegreeXCoursePool (degree, coursepool, creditsRequired)
+SELECT (SELECT id FROM Degree WHERE name = 'Computer Science'), (SELECT id FROM CoursePool WHERE name = 'Computer Science Core'), 33 UNION ALL
+SELECT (SELECT id FROM Degree WHERE name = 'Computer Science'), (SELECT id FROM CoursePool WHERE name = 'Computer Science Complementary Core'), 6 UNION ALL
+SELECT (SELECT id FROM Degree WHERE name = 'Computer Science'), (SELECT id FROM CoursePool WHERE name = 'Computer Science Electives'), 18 UNION ALL
+SELECT (SELECT id FROM Degree WHERE name = 'Computer Science'), (SELECT id FROM CoursePool WHERE name = 'Mathematics Electives: BCompSC'), 6 UNION ALL
+SELECT (SELECT id FROM Degree WHERE name = 'Computer Science'), (SELECT id FROM CoursePool WHERE name = 'General Electives: BCompSc'), 27 UNION ALL
 
--- CoursePool table
-INSERT INTO CoursePool (id, name)
-VALUES ('1', 'Core Courses'),
-       ('2', 'Electives'),
-       ('3', 'Special Topics');
+SELECT (SELECT id FROM Degree WHERE name = 'Computer Engineering'), (SELECT id FROM CoursePool WHERE name = 'Engineering Core'), 30.5 UNION ALL
+SELECT (SELECT id FROM Degree WHERE name = 'Computer Engineering'), (SELECT id FROM CoursePool WHERE name = 'Computer Engineering Core'), 69.5 UNION ALL
+SELECT (SELECT id FROM Degree WHERE name = 'Computer Engineering'), (SELECT id FROM CoursePool WHERE name = 'Computer Engineering Electives'), 20 UNION ALL
 
--- DegreeXCoursePool table
-INSERT INTO DegreeXCoursePool (id, degree, coursepool, creditsRequired)
-VALUES ('1', '1', '1', 30),  -- DegreeID 1 linked to CoursePoolID 1
-       ('2', '1', '2', 15),  -- DegreeID 1 linked to CoursePoolID 2
-       ('3', '2', '3', 12);  -- DegreeID 2 linked to CoursePoolID 3
+SELECT (SELECT id FROM Degree WHERE name = 'Electrical Engineering'), (SELECT id FROM CoursePool WHERE name = 'Engineering Core'), 30.5 UNION ALL
+SELECT (SELECT id FROM Degree WHERE name = 'Electrical Engineering'), (SELECT id FROM CoursePool WHERE name = 'Electrical Engineering Core'), 72.5 UNION ALL
+SELECT (SELECT id FROM Degree WHERE name = 'Electrical Engineering'), (SELECT id FROM CoursePool WHERE name = 'Electrical Engineering Electives'), 17 UNION ALL
+
+SELECT (SELECT id FROM Degree WHERE name = 'Software Engineering'), (SELECT id FROM CoursePool WHERE name = 'Engineering Core'), 30.5 UNION ALL
+SELECT (SELECT id FROM Degree WHERE name = 'Software Engineering'), (SELECT id FROM CoursePool WHERE name = 'Software Engineering Core'), 47.5 UNION ALL
+SELECT (SELECT id FROM Degree WHERE name = 'Software Engineering'), (SELECT id FROM CoursePool WHERE name = 'Computer Science Group: Software Engineering'), 23 UNION ALL
+SELECT (SELECT id FROM Degree WHERE name = 'Software Engineering'), (SELECT id FROM CoursePool WHERE name = 'Engineering and Natural Science Group: Software Engineering'), 3 UNION ALL
+SELECT (SELECT id FROM Degree WHERE name = 'Software Engineering'), (SELECT id FROM CoursePool WHERE name = 'Software Engineering Electives'), 16;
 
 -- CourseXCoursePool table
 INSERT INTO CourseXCoursePool (id, coursecode, coursepool)
