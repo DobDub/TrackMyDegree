@@ -93,10 +93,20 @@ CREATE TABLE Exemption (
 
 -- Corrected INSERT statements
 
--- Degree table
-INSERT INTO Degree (id, name, totalCredits)
-VALUES ('1', 'Bachelor of Science in Computer Science', 120),
-       ('2', 'Bachelor of Arts in Business Administration', 120);
+-- Insert into Degree table
+INSERT INTO Degree (name, totalCredits)
+VALUES ('Building Engineering', 119),
+       ('Aerospace Engineering', 120),
+       ('Civil Engineering', 119),
+       ('Computer Engineering', 120),
+       ('Computer Science', 90),
+       ('Computer Science – Computation Arts', 90),
+       ('Data Science', 120),
+       ('Electrical Engineering', 120),
+       ('Health and Life Sciences', 90),
+       ('Industrial Engineering', 120),
+       ('Mechanical Engineering', 120),
+       ('Software Engineering', 120);
 
 -- Course table
 INSERT INTO Course (code, credits, description)
