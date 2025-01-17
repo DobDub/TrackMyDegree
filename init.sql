@@ -108,11 +108,22 @@ VALUES ('Building Engineering', 119),
        ('Mechanical Engineering', 120),
        ('Software Engineering', 120);
 
--- Course table
-INSERT INTO Course (code, credits, description)
-VALUES ('COMP335', 3, 'Introduction to Programming'),
-       ('SOEN363', 3, 'Database Systems'),
-       ('SOEN287', 3, 'Web Development');
+-- Insert into CoursePool table
+INSERT INTO CoursePool (name)
+VALUES ('Engineering Core'),
+       ('Software Engineering Core'),
+       ('Computer Science Group: Software Engineering'),
+       ('Engineering and Natural Science Group: Software Engineering'),
+       ('Software Engineering Electives')
+       ('Computer Engineering Core'),
+       ('Computer Engineering Electives'),
+       ('Electrical Engineering Core'),
+       ('Electrical Engineering Electives'),
+       ('Computer Science Core'),
+       ('Computer Science Complementary Core'),
+       ('Computer Science Electives'),
+       ('Mathematics Electives: BCompSC'),
+       ('General Electives: BCompSc');
 
 -- Requisite table
 INSERT INTO Requisite (id, code1, code2, type)
