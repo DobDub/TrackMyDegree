@@ -6,8 +6,7 @@ import RequisiteTypes from "@controllers/requisiteController/requisite_types"
 const router = express.Router();
 
 router.post('/create', async (req: Request, res: Response) => {
-    const { id, code1, code2, type } = req.body as {
-        id: string;
+    const { code1, code2, type } = req.body as {
         code1: string;
         code2: string;
         type: RequisiteTypes.RequisiteType;
@@ -16,16 +15,16 @@ router.post('/create', async (req: Request, res: Response) => {
   
     try {
       // Validate input
-      if (!id || !code1 || !code2 || !type ) {
+      if (!code1 || !code2 || !type ) {
 
         res.status(HTTP.BAD_REQUEST).json({
-          error: 'Invalid input. Please provide id, code1, and code2 as a string.',
+          error: 'Invalid input. Please provide code1, and code2 as a string.',
         });
         return;
       }
   
       // Call the service function
-      const newRequisite = await requisiteController.createRequisite(id, code1, code2, type);
+      const newRequisite = await requisiteController.createRequisite(code1, code2, type);
   
       // Send success response
       res.status(HTTP.CREATED).json({
@@ -45,20 +44,24 @@ router.post('/create', async (req: Request, res: Response) => {
   });
   
 
-  router.get('/read', async (req: Request, res: Response) => {
-    const { id } = req.body;
+  router.post('/read', async (req: Request, res: Response) => {
+    const { code1, code2, type } = req.body as {
+      code1: string;
+      code2: string;
+      type: RequisiteTypes.RequisiteType;
+    };
   
     try {
       // Validate input
-      if (!id || typeof id !== 'string') {
+      if (!code1 || !code2 || !type) {
         res.status(HTTP.BAD_REQUEST).json({
-          error: 'Invalid input. Please provide id as a string.',
+          error: 'Invalid input. Please provide code1, and code2 as a string.',
         });
         return;
       }
   
       // Call the service function
-      const newRequisite = await requisiteController.readRequisite(id);
+      const newRequisite = await requisiteController.readRequisite(code1, code2, type);
   
       // Send success response
       res.status(HTTP.OK).json({
@@ -67,7 +70,7 @@ router.post('/create', async (req: Request, res: Response) => {
       });
     } catch (error) {
       // Handle errors from the service
-      if (error instanceof Error && error.message === 'Requisite with this id does not exist.') {
+      if (error instanceof Error && error.message === 'Requisite with this course combination does not exist.') {
         res.status(HTTP.FORBIDDEN).json({ error: error.message });
       } else {
         const errMsg = 'Internal server error in /requisite/read';
@@ -78,8 +81,7 @@ router.post('/create', async (req: Request, res: Response) => {
   });
 
   router.put('/update', async (req: Request, res: Response) => {
-    const { id, code1, code2, type } = req.body as {
-        id: string;
+    const { code1, code2, type } = req.body as {
         code1: string;
         code2: string;
         type: RequisiteTypes.RequisiteType;
@@ -87,7 +89,7 @@ router.post('/create', async (req: Request, res: Response) => {
   
     try {
       // Validate input
-      if (!id || !code1 || !code2 || !type) {
+      if ( !code1 || !code2 || !type ) {
 
         res.status(HTTP.BAD_REQUEST).json({
           error: 'Invalid input.',
@@ -96,7 +98,7 @@ router.post('/create', async (req: Request, res: Response) => {
       }
   
       // Call the service function
-      const updatedRequisite = await requisiteController.updateRequisite(id, code1, code2, type);
+      const updatedRequisite = await requisiteController.updateRequisite(code1, code2, type);
   
       // Send success response
       res.status(HTTP.OK).json({
@@ -105,7 +107,7 @@ router.post('/create', async (req: Request, res: Response) => {
       });
     } catch (error) {
       // Handle errors from the service
-      if (error instanceof Error && error.message === 'Requisite with this id does not exist.') {
+      if (error instanceof Error && error.message === 'Requisite with this course combination does not exist.') {
         res.status(HTTP.FORBIDDEN).json({ error: error.message });
       } else {
         const errMsg = 'Internal server error in /requisite/update';
@@ -116,19 +118,19 @@ router.post('/create', async (req: Request, res: Response) => {
   });
 
   router.post('/delete', async (req: Request, res: Response) => {
-    const { id } = req.body;
+    const { code1, code2, type } = req.body;
   
     try {
       // Validate input
-      if (!id || typeof id !== 'string') {
+      if (!code1 || !code2 || !type) {
         res.status(HTTP.BAD_REQUEST).json({
-          error: 'Invalid input. Please provide id as a string.',
+          error: 'Invalid input.',
         });
         return;
       }
   
       // Call the service function
-        await requisiteController.deleteRequisite(id);
+        await requisiteController.deleteRequisite(code1, code2, type);
   
       // Send success response
       res.status(HTTP.OK).json({
@@ -136,7 +138,7 @@ router.post('/create', async (req: Request, res: Response) => {
       });
     } catch (error) {
       // Handle errors from the service
-      if (error instanceof Error && error.message === 'Requisite with this id does not exist.') {
+      if (error instanceof Error && error.message === 'Requisite with this course combination does not exist.') {
         res.status(HTTP.FORBIDDEN).json({ error: error.message });
       } else {
         const errMsg = 'Internal server error in /requisite/delete';

@@ -39,7 +39,7 @@ router.post('/create', async (req: Request, res: Response) => {
   });
   
 
-  router.get('/read', async (req: Request, res: Response) => {
+  router.post('/read', async (req: Request, res: Response) => {
     const { id } = req.body;
   
     try {
