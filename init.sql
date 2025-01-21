@@ -1,11 +1,11 @@
 CREATE TABLE Degree (
-  id UUID PRIMARY KEY DEFAULT (UUID()),
+  id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
   name VARCHAR(255) UNIQUE NOT NULL,
   totalCredits INT NOT NULL
 );
 
 CREATE TABLE Course (
-  code VARCHAR(7) NOT NULL,
+  code VARCHAR(8) NOT NULL,
   credits INT NOT NULL,
   description VARCHAR(255) NOT NULL,
   title TEXT NOT NULL,
@@ -15,9 +15,9 @@ CREATE TABLE Course (
 );
 
 CREATE TABLE Requisite (
-    id UUID PRIMARY KEY DEFAULT (UUID()),
-    code VARCHAR(7),
-    reqCode VARCHAR(7),
+    id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    code VARCHAR(8),
+    reqCode VARCHAR(8),
     groupId INT,
     type VARCHAR(3) CHECK (type IN ('pre', 'co')),
     FOREIGN KEY (code) REFERENCES Course(code),
@@ -25,54 +25,54 @@ CREATE TABLE Requisite (
 );
 
 CREATE TABLE CoursePool (
-  id UUID PRIMARY KEY DEFAULT (UUID()),
+  id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
   name VARCHAR(255) NOT NULL UNIQUE
 );
 
 CREATE TABLE DegreeXCoursePool (
-  id UUID PRIMARY KEY DEFAULT (UUID()),
-  degree VARCHAR(255),
-  coursepool VARCHAR(255),
-  creditsRequired INT NOT NULL,
+  id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+  degree UNIQUEIDENTIFIER,
+  coursepool UNIQUEIDENTIFIER,
+  creditsRequired FLOAT NOT NULL,
   UNIQUE(degree, coursepool),
   FOREIGN KEY (degree) REFERENCES Degree(id),
   FOREIGN KEY (coursepool) REFERENCES CoursePool(id)
 );
 
 CREATE TABLE CourseXCoursePool (
-  id UUID PRIMARY KEY DEFAULT (UUID()),
-  coursecode VARCHAR(7),
-  coursepool VARCHAR(255),
+  id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+  coursecode VARCHAR(8),
+  coursepool UNIQUEIDENTIFIER,
   UNIQUE(coursecode, coursepool),
   FOREIGN KEY (coursecode) REFERENCES Course(code), -- Composite foreign key
   FOREIGN KEY (coursepool) REFERENCES CoursePool(id)
 );
 
 CREATE TABLE AppUser (  -- Use square brackets for reserved keywords
-    id UUID PRIMARY KEY DEFAULT (UUID()),
+    id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
     email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     fullname VARCHAR(255) NOT NULL,
-    degree VARCHAR(255),
+    degree UNIQUEIDENTIFIER,
     type VARCHAR(10) CHECK (type IN ('student', 'advisor', 'admin')) NOT NULL,
     FOREIGN KEY (degree) REFERENCES Degree(id)
 );
 
 CREATE TABLE Timeline (
-    id UUID PRIMARY KEY DEFAULT (UUID()),
+    id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
     season VARCHAR(10) CHECK (season IN ('fall', 'winter', 'summer1', 'summer2', 'fall/winter', 'summer')) NOT NULL,
     year INT NOT NULL,
-    coursecode VARCHAR(7) NOT NULL,
-    user_id VARCHAR(255) NOT NULL,
+    coursecode VARCHAR(8) NOT NULL,
+    user_id UNIQUEIDENTIFIER NOT NULL,
     UNIQUE(user_id, coursecode, season, year),
     FOREIGN KEY (coursecode) REFERENCES Course(code), -- Composite foreign key
     FOREIGN KEY (user_id) REFERENCES AppUser (id)  -- Adjusted foreign key reference
 );
 
 CREATE TABLE Deficiency (
-    id UUID PRIMARY KEY DEFAULT (UUID()),
-    coursepool VARCHAR(255),
-    user_id VARCHAR(255),
+    id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    coursepool UNIQUEIDENTIFIER,
+    user_id UNIQUEIDENTIFIER,
     creditsRequired INT NOT NULL,
     UNIQUE(user_id, coursepool),
     FOREIGN KEY (coursepool) REFERENCES CoursePool(id),
@@ -80,9 +80,9 @@ CREATE TABLE Deficiency (
 );
 
 CREATE TABLE Exemption (
-    id UUID PRIMARY KEY DEFAULT (UUID()),
-    coursecode VARCHAR(7),
-    user_id VARCHAR(255),
+    id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
+    coursecode VARCHAR(8),
+    user_id UNIQUEIDENTIFIER,
     UNIQUE(user_id, coursecode),
     FOREIGN KEY (coursecode) REFERENCES Course(code), -- Composite foreign key
     FOREIGN KEY (user_id) REFERENCES AppUser (id)
@@ -128,7 +128,7 @@ INSERT INTO Course (code, credits, description, title, components, notes) VALUES
 ('COMP 335', 3, 'This course covers the following topics: finite state automata and regular languages; push ‑ down automata and context ‑ free languages; pumping lemmas; applications to parsing; Turing machines; undecidability and decidability.', 'Introduction to Theoretical Computer Science', 'Lecture 3 hours per week; Tutorial 2 hours per week', ''),
 ('COMP 346', 4, 'Fundamentals of operating system functionalities, design and implementation. Multiprogramming: processes and threads, context switching, queuing models and scheduling. Interprocess communication and synchronization. Principles of concurrency. Synchronization primitives. Deadlock detection and recovery, prevention and avoidance schemes. Memory management. Device management. File systems. Protection models and schemes.', 'Operating Systems', 'Lecture 3 hours per week; Tutorial 1 hour per week; Laboratory 2 hours per week Notes: Students who have received credit for COEN 346 may not take this course for credit.', 'Students who have received credit for COEN 346 may not take this course for credit.'),
 ('COMP 348', 3, 'Survey of programming paradigms: Imperative, functional, and logic programming. Issues in the design and implementation of programming languages. Declaration models: binding, visibility, and scope. Type systems, including static and dynamic typing. Parameter passing mechanisms. Hybrid language design.', 'Principles of Programming Languages', 'Lecture 2 hours per week; Tutorial 1 hour per week', ''),
-('COMP 352', 3, 'Abstract data types: stacks and queues, trees, priority queues, dictionaries. Data structures: arrays, linked lists, heaps, hash tables, search trees. Design and analysis of algorithms: asymptotic notation, recursive algorithms, searching and sorting, tree traversal, graph algorithms.', 'Data Structures and Algorithms', 'Lecture 3 hours per week; Tutorial 1 hour per week Notes: Students who have received credit for COEN 352 may not take this course for credit.', 'Students who have received credit for COEN 352 may not take this course for credit.')
+('COMP 352', 3, 'Abstract data types: stacks and queues, trees, priority queues, dictionaries. Data structures: arrays, linked lists, heaps, hash tables, search trees. Design and analysis of algorithms: asymptotic notation, recursive algorithms, searching and sorting, tree traversal, graph algorithms.', 'Data Structures and Algorithms', 'Lecture 3 hours per week; Tutorial 1 hour per week Notes: Students who have received credit for COEN 352 may not take this course for credit.', 'Students who have received credit for COEN 352 may not take this course for credit.'),
   -- from software engineeering core file:
 ('SOEN 228', 4, 'This course covers the following topics: Boolean Algebra, Digital logic and the design of logic circuits; CPU design; addressing modes; instruction sets and sequencing; design of datapath and control units; memory systems and types; cache memory levels; I/O devices and their interconnection to the CPU; assembly language, and Interrupts.', 'System Hardware', 'Lecture 3 hours per week; Tutorial 2 hours per week; Laboratory 2 hours per week Notes: Students who have received credit for COMP 228 may not take this course for credit.', 'Students who have received credit for COMP 228 may not take this course for credit.'),
 ('SOEN 287', 3, 'This course covers the following topics: internet architecture and protocols; web applications through clients and servers; modern HTML and CSS; client‑side programming using modern JavaScript and an overview of the advantages of some common modern JavaScript libraries; Regular Expressions; static website contents and dynamic page generation through server‑side programming; preserving state (client‑side) in web applications; deploying static and dynamic websites and content management systems vs. website deployment.', 'Web Programming', 'Lecture 3 hours per week; Tutorial 2 hours per week', ''),
@@ -229,7 +229,7 @@ INSERT INTO Requisite (code, reqCode, type, groupId) VALUES
 ('ENGR 391', 'BCEE 231', 'pre', 1),
 ('ENGR 392', 'ENCS 282', 'pre', NULL),
 ('ENGR 392', 'ENGR 201', 'pre', NULL),
-('ENGR 392', 'ENGR 202', 'pre', NULL)
+('ENGR 392', 'ENGR 202', 'pre', NULL),
   -- from software engineeering core file:
 ('SOEN 228', 'MATH 203', 'pre', NULL),
 ('SOEN 228', 'MATH 204', 'pre', NULL),
@@ -334,7 +334,7 @@ VALUES ('Engineering Core'),
        ('Software Engineering Core'),
        ('Computer Science Group: Software Engineering'),
        ('Engineering and Natural Science Group: Software Engineering'),
-       ('Software Engineering Electives')
+       ('Software Engineering Electives'),
        ('Computer Engineering Core'),
        ('Computer Engineering Electives'),
        ('Electrical Engineering Core'),
@@ -367,28 +367,64 @@ SELECT (SELECT id FROM Degree WHERE name = 'Software Engineering'), (SELECT id F
 SELECT (SELECT id FROM Degree WHERE name = 'Software Engineering'), (SELECT id FROM CoursePool WHERE name = 'Engineering and Natural Science Group: Software Engineering'), 3 UNION ALL
 SELECT (SELECT id FROM Degree WHERE name = 'Software Engineering'), (SELECT id FROM CoursePool WHERE name = 'Software Engineering Electives'), 16;
 
--- CourseXCoursePool table
+-- Insert into CourseXCoursePool table
+-- Engineering Core courses
 INSERT INTO CourseXCoursePool (id, coursecode, coursepool)
-VALUES ('1', 'COMP335', '1'),  -- CourseID 1 linked to CoursePoolID 1
-       ('2', 'SOEN363', '2'),  -- CourseID 2 linked to CoursePoolID 2
-       ('3', 'SOEN287', '3');  -- CourseID 3 linked to CoursePoolID 3
+SELECT NEWID(), code, (SELECT id FROM CoursePool WHERE name = 'Engineering Core')
+FROM Course 
+WHERE code IN ('ELEC 275', 'ENCS 282', 'ENGR 201', 'ENGR 202', 'ENGR 213', 
+               'ENGR 233', 'ENGR 301', 'ENGR 371', 'ENGR 391', 'ENGR 392');
+
+-- Computer Science Group: Software Engineering courses
+INSERT INTO CourseXCoursePool (id, coursecode, coursepool)
+SELECT NEWID(), code, (SELECT id FROM CoursePool WHERE name = 'Computer Science Group: Software Engineering')
+FROM Course 
+WHERE code IN ('COMP 232', 'COMP 248', 'COMP 249', 'COMP 335', 
+               'COMP 346', 'COMP 348', 'COMP 352');
+
+-- Software Engineering Core courses
+INSERT INTO CourseXCoursePool (id, coursecode, coursepool)
+SELECT NEWID(), code, (SELECT id FROM CoursePool WHERE name = 'Software Engineering Core')
+FROM Course 
+WHERE code IN ('SOEN 228', 'SOEN 287', 'SOEN 321', 'SOEN 331', 'SOEN 341',
+               'SOEN 342', 'SOEN 343', 'SOEN 345', 'SOEN 357', 'SOEN 363',
+               'SOEN 384', 'SOEN 390', 'SOEN 490');
+
+-- Engineering and Natural Science Group: Software Engineering courses
+INSERT INTO CourseXCoursePool (id, coursecode, coursepool)
+SELECT NEWID(), code, (SELECT id FROM CoursePool WHERE name = 'Engineering and Natural Science Group: Software Engineering')
+FROM Course 
+WHERE code IN ('ENGR 245', 'MIAE 221');
+
+-- Software Engineering Electives courses
+INSERT INTO CourseXCoursePool (id, coursecode, coursepool)
+SELECT NEWID(), code, (SELECT id FROM CoursePool WHERE name = 'Software Engineering Electives')
+FROM Course 
+WHERE code IN ('AERO 480', 'AERO 482', 'COEN 320', 'COMP 333', 'COMP 339',
+               'COMP 345', 'COMP 371', 'COMP 376', 'COMP 425', 'COMP 426',
+               'COMP 428', 'COMP 432', 'COMP 433', 'COMP 438', 'COMP 442',
+               'COMP 444', 'COMP 445', 'COMP 451', 'COMP 465', 'COMP 472',
+               'COMP 473', 'COMP 474', 'COMP 475', 'COMP 476', 'COMP 477',
+               'COMP 478', 'COMP 479', 'COMP 498', 'COMP 499', 'SOEN 298',
+               'SOEN 344', 'SOEN 387', 'SOEN 422', 'SOEN 423', 'SOEN 448',
+               'SOEN 471', 'SOEN 487', 'SOEN 491', 'SOEN 498', 'SOEN 499',
+               'ENGR 411');
 
 -- User table (changed from AppUser to [User])
-INSERT INTO AppUser (id, email, password, fullname, degree, type)
-VALUES ('1', 'jd1@concordia.ca', '1234', 'John Doe', '1', 'student'),
-       ('2', 'jd2@concordia.ca', '5678', 'Jane Doe', '', 'advisor');
+INSERT INTO AppUser (email, password, fullname, degree, type)
+SELECT 'jd1@concordia.ca', '1234', 'John Doe', (SELECT id FROM Degree WHERE name = 'Software Engineering'), 'student' UNION ALL
+SELECT 'jd2@concordia.ca', '5678', 'Jane Doe', NULL, 'advisor';
 
 -- Timeline table
-INSERT INTO Timeline (id, season, year, coursecode, user_id)
-VALUES ('1', 'winter', 2024, 'COMP335', '1'),  -- UserID 1's timeline for winter 2024
-       ('2', 'fall', 2025, 'COMP335', '2');  -- UserID 2's timeline for fall 2025
+INSERT INTO Timeline (season, year, coursecode, user_id)
+SELECT 'winter', 2024, 'COMP 333', (SELECT id FROM AppUser WHERE fullname = 'John Doe') UNION ALL
+SELECT 'fall', 2025, 'COMP 333', (SELECT id FROM AppUser WHERE fullname = 'Jane Doe');
 
 -- Deficiency table
-INSERT INTO Deficiency (id, coursepool, user_id, creditsRequired)
-VALUES ('1', '1', '1', 3),  -- UserID 1 has a deficiency
-       ('2', '2', '2', 3);  -- UserID 2 has a deficiency
+INSERT INTO Deficiency (coursepool, user_id, creditsRequired)
+SELECT (SELECT id FROM coursepool WHERE name = 'Engineering and Natural Science Group: Software Engineering'), (SELECT id FROM AppUser WHERE fullname = 'John Doe'), 3 UNION ALL
+SELECT (SELECT id FROM coursepool WHERE name = 'Computer Engineering Electives'), (SELECT id FROM AppUser WHERE fullname = 'Jane Doe'), 3 ;
 
 -- Exemption table
-INSERT INTO Exemption (id, coursecode, user_id)
-VALUES ('1', 'COMP335', '1');  -- UserID 1 has an exemption
-
+INSERT INTO Exemption (coursecode, user_id)
+SELECT 'COMP 333', (SELECT id FROM AppUser WHERE fullname = 'John Doe');
