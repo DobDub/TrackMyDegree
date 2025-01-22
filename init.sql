@@ -123,22 +123,22 @@ VALUES ('1', 'COMP335', '1'),  -- CourseID 1 linked to CoursePoolID 1
        ('2', 'SOEN363', '2'),  -- CourseID 2 linked to CoursePoolID 2
        ('3', 'SOEN287', '3');  -- CourseID 3 linked to CoursePoolID 3
 
--- User table (changed from AppUser to [User])
+-- AppUser table
 INSERT INTO AppUser (id, email, password, fullname, degree, type)
 VALUES ('1', 'jd1@concordia.ca', '1234', 'John Doe', '1', 'student'),
-       ('2', 'jd2@concordia.ca', '5678', 'Jane Doe', '', 'advisor');
+       ('2', 'jd2@concordia.ca', '5678', 'Jane Doe', '2', 'advisor'); -- Ensure degree matches 'Degree(id)'
 
 -- Timeline table
 INSERT INTO Timeline (id, season, year, coursecode, user_id)
-VALUES ('1', 'winter', 2024, 'COMP335', '1'),  -- UserID 1's timeline for winter 2024
-       ('2', 'fall', 2025, 'COMP335', '2');  -- UserID 2's timeline for fall 2025
+VALUES ('1', 'winter', 2024, 'COMP335', '1'),  -- UserID 1 references a valid AppUser ID
+       ('2', 'fall', 2025, 'COMP335', '2');   -- UserID 2 references a valid AppUser ID
 
 -- Deficiency table
 INSERT INTO Deficiency (id, coursepool, user_id, creditsRequired)
-VALUES ('1', '1', '1', 3),  -- UserID 1 has a deficiency
-       ('2', '2', '2', 3);  -- UserID 2 has a deficiency
+VALUES ('1', '1', '1', 3),  -- UserID 1 exists
+       ('2', '2', '2', 3);  -- UserID 2 exists
 
 -- Exemption table
 INSERT INTO Exemption (id, coursecode, user_id)
-VALUES ('1', 'COMP335', '1');  -- UserID 1 has an exemption
+VALUES ('1', 'COMP335', '1');  -- UserID 1 exists
 
