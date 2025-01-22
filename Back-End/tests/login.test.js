@@ -1,8 +1,10 @@
 const request = require("supertest");
 
+const url = process.DOCKER_URL || "host.docker.internal:8000";
+
 describe("POST /auth/login", () => {
 	it("should return a successful login message and token", async () => {
-		const response = await request("http://localhost:8000")
+		const response = await request(url)
 			.post("/auth/login")
 			.send({
 				email: "example@example.com",
@@ -14,13 +16,13 @@ describe("POST /auth/login", () => {
 		expect(response.body).toHaveProperty("id");
 		expect(response.body).toHaveProperty("email", "example@example.com");
 		expect(response.body).toHaveProperty("password");
-		expect(response.body).toHaveProperty("name", "Random User");
+		expect(response.body).toHaveProperty("fullname", "Random User");
 		expect(response.body).toHaveProperty("type", "student");
 	});
 
 	// Wrong field request
 	it("should return 401 status and error message when password is incorrect", async () => {
-		const response = await request("http://localhost:8000")
+		const response = await request(url)
 			.post("/auth/login")
 			.send({
 				email: "example@example.com",
@@ -37,7 +39,7 @@ describe("POST /auth/login", () => {
 
 	// Bad request, nissing fields
 	it("should return 400 status and error message when the body is incorrect", async () => {
-		const response = await request("http://localhost:8000")
+		const response = await request(url)
 			.post("/auth/login")
 			.send({
 				email: "example@example.com", // missing password field

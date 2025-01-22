@@ -8,7 +8,10 @@ import HTTP from "@Util/HTTPCodes";
 //Routes import
 import authRouter from "@routes/auth";
 import coursesRouter from "@routes/courses";
-import degreeRouter from "@routes/degree"
+import degreeRouter from "@routes/degree";
+import timelineRouter from "@routes/timeline";
+import AppUser from "@routes/appUser";
+import userDataRouter from "@routes/userData"
 import exemptionRouter from "@routes/exemption"
 import deficiencyRouter from "@routes/deficiency"
 import requisiteRouter from "@routes/requisite"
@@ -25,7 +28,7 @@ const CLIENT = process.env.CLIENT || "http://localhost:3000";
 // needs to be first
 app.use((req, res, next) => {
 
-	res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
+	res.header('Access-Control-Allow-Origin', ['http://localhost:3000', HOPPSCOTCH]);
 	res.header('Access-Control-Allow-Credentials', 'true');
 	res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 	res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
@@ -45,14 +48,17 @@ app.use(express.json());
 app.use(cookieParser());
 
 
-
 //Routes
 app.use("/auth", authRouter);
 app.use("/courses", coursesRouter);
 app.use("/degree", degreeRouter);
+app.use("/timeline", timelineRouter);
+app.use("/appUser", AppUser);
+app.use("/data", userDataRouter);
 app.use("/exemption", exemptionRouter);
 app.use("/deficiency", deficiencyRouter);
 app.use("/requisite", requisiteRouter);
+
 
 /**
  * DB test route

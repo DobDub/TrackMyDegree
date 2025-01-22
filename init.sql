@@ -1,3 +1,4 @@
+-- Active: 1731210639535@@localhost@1433@master
 CREATE TABLE Degree (
   id VARCHAR(255) PRIMARY KEY,
   name VARCHAR(255) UNIQUE NOT NULL,
@@ -123,10 +124,9 @@ VALUES ('1', 'COMP335', '1'),  -- CourseID 1 linked to CoursePoolID 1
        ('2', 'SOEN363', '2'),  -- CourseID 2 linked to CoursePoolID 2
        ('3', 'SOEN287', '3');  -- CourseID 3 linked to CoursePoolID 3
 
--- AppUser table
 INSERT INTO AppUser (id, email, password, fullname, degree, type)
 VALUES ('1', 'jd1@concordia.ca', '1234', 'John Doe', '1', 'student'),
-       ('2', 'jd2@concordia.ca', '5678', 'Jane Doe', '2', 'advisor'); -- Ensure degree matches 'Degree(id)'
+       ('2', 'jd2@concordia.ca', '5678', 'Jane Doe', NULL, 'advisor');
 
 -- Timeline table
 INSERT INTO Timeline (id, season, year, coursecode, user_id)
