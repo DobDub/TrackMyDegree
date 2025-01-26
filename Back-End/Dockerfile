@@ -14,6 +14,8 @@ RUN yarn
 # Copy the entire application source code into the container
 COPY . .
 
+RUN yarn run build
+
 # Expose the port your app runs on
 EXPOSE 8000
 
