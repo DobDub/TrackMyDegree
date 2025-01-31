@@ -1,46 +1,33 @@
-import msSQL                  from 'mssql'
-import SQL                    from '@controllers/DBController/DB_types'
-import dotenv                 from 'dotenv'
+import { Pool } from 'pg';
+import dotenv from 'dotenv';
 
+dotenv.config(); // Load environment variables
 
-dotenv.config();                                                               //Env Var config
-
-const sqlConfig: SQL.Config = {                                                // Configure the connection
-  user      : process.env.SQL_SERVER_USER,
-  password  : process.env.SQL_SERVER_PASSWORD,
-  database  : process.env.SQL_SERVER_DATABASE,
-  server    : process.env.SQL_SERVER_HOST,
-  options   : {
-                encrypt                 : true,                                // for Azure SQL
-                trustServerCertificate  : true,                                // change to true for local dev/self-signed certs
-              },
-};
-
-
-//Functions
+const pool = new Pool({
+  user: process.env.SQL_SERVER_USER,
+  password: process.env.SQL_SERVER_PASSWORD,
+  database: process.env.SQL_SERVER_DATABASE,
+  host: process.env.SQL_SERVER_HOST,
+  port: Number(process.env.SQL_SERVER_PORT) || 5432, // Default PostgreSQL port
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false, // Optional SSL config
+});
 
 /**
  * Get connection obj to database
- * @returns A promise of a msSQL ConnectionPool object, or throws an error
- * 
+ * @returns A promise of a Pool Client object, or throws an error
  */
-async function getConnection(): Promise<msSQL.ConnectionPool | undefined> {
+async function getConnection() {
   try {
-    const pool = await msSQL.connect(sqlConfig);
-    console.log("Connected to SQL Server successfully!");
-    return pool;
-  } 
-  catch (error) {
+    const client = await pool.connect();
+    console.log("Connected to PostgreSQL successfully!");
+    return client;
+  } catch (error) {
     console.error("Database connection failed:", error);
   }
 }
 
-
-
-const DBController = {                                                         //Default export
-  msSQL,                                                                       //Object
-
-  getConnection                                                                //Methods
+const DBController = {
+  getConnection
 };
 
 export default DBController;

@@ -10,7 +10,7 @@ export const getUserData = async (req: Request, res: Response): Promise<void> =>
         return;
     }
 
-    const conn = await Database.getConnection();
+    const conn = await Database.getConnection(); // Ensure this returns a PostgreSQL client
 
     if (!conn) {
         res.status(500).json({ message: "Database connection failed" });
@@ -19,60 +19,55 @@ export const getUserData = async (req: Request, res: Response): Promise<void> =>
 
     try {
         // Check if the user exists
-        const userCheckResult = await conn.request()
-            .input("id", Database.msSQL.VarChar, id)
-            .query(
-                `SELECT id FROM AppUser WHERE id = @id`
-            );
+        const userCheckResult = await conn.query(
+            `SELECT id FROM "AppUser" WHERE id = $1`,
+            [id]
+        );
 
-        if (userCheckResult.recordset.length === 0) {
+        if (userCheckResult.rows.length === 0) {
             res.status(404).json({ message: "User not found" });
             return;
         }
 
         // Fetch timeline
-        const timelineResult = await conn.request()
-            .input("id", Database.msSQL.VarChar, id)
-            .query(
-                `SELECT season, year, coursecode 
-                 FROM Timeline 
-                 WHERE user_id = @id`
-            );
+        const timelineResult = await conn.query(
+            `SELECT season, year, coursecode 
+             FROM "Timeline" 
+             WHERE user_id = $1`,
+            [id]
+        );
 
         // Fetch deficiencies
-        const deficiencyResult = await conn.request()
-            .input("id", Database.msSQL.VarChar, id)
-            .query(
-                `SELECT coursepool, creditsRequired 
-                 FROM Deficiency 
-                 WHERE user_id = @id`
-            );
+        const deficiencyResult = await conn.query(
+            `SELECT coursepool, creditsRequired 
+             FROM "Deficiency" 
+             WHERE user_id = $1`,
+            [id]
+        );
 
         // Fetch exemptions
-        const exemptionResult = await conn.request()
-            .input("id", Database.msSQL.VarChar, id)
-            .query(
-                `SELECT coursecode 
-                 FROM Exemption 
-                 WHERE user_id = @id`
-            );
+        const exemptionResult = await conn.query(
+            `SELECT coursecode 
+             FROM "Exemption" 
+             WHERE user_id = $1`,
+            [id]
+        );
 
         // Fetch degree
-        const degreeResult = await conn.request()
-            .input("id", Database.msSQL.VarChar, id)
-            .query(
-                `SELECT Degree.id, Degree.name, Degree.totalCredits 
-                 FROM AppUser 
-                 JOIN Degree ON AppUser.degree = Degree.id 
-                 WHERE AppUser.id = @id`
-            );
+        const degreeResult = await conn.query(
+            `SELECT "Degree".id, "Degree".name, "Degree".totalCredits 
+             FROM "AppUser" 
+             JOIN "Degree" ON "AppUser".degree = "Degree".id 
+             WHERE "AppUser".id = $1`,
+            [id]
+        );
 
         // Combine data into a structured response
         const response: UserDataResponse = {
-            timeline: timelineResult.recordset,
-            deficiencies: deficiencyResult.recordset,
-            exemptions: exemptionResult.recordset,
-            degree: degreeResult.recordset[0] || null,
+            timeline: timelineResult.rows,
+            deficiencies: deficiencyResult.rows,
+            exemptions: exemptionResult.rows,
+            degree: degreeResult.rows[0] || null,
         };
 
         res.status(200).json(response);

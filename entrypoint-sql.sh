@@ -1,13 +1,16 @@
 #!/bin/bash
 
-# Start SQL Server in the background
-/opt/mssql/bin/sqlservr &
+# Wait for PostgreSQL to start up
+echo "Waiting for PostgreSQL to start..."
+until pg_isready -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB"; do
+  echo "Waiting for PostgreSQL to be available..."
+  sleep 2
+done
 
-# Wait for SQL Server to start up
-sleep 10
+echo "PostgreSQL is up and running."
 
 # Run the initialization script
-/opt/mssql-tools18/bin/sqlcmd -S localhost -U SA -P 'MySecureP@ss123' -i /docker-entrypoint-initdb.d/init.sql -C
+PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f /docker-entrypoint-initdb.d/init.sql
 
-# Wait for SQL Server to exit
-wait
+# Keep the container running
+tail -f /dev/null

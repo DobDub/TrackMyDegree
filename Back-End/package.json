@@ -8,9 +8,9 @@
 		"bcryptjs": "^2.4.3",
 		"cookie-parser": "^1.4.7",
 		"cors": "^2.8.5",
-		"dotenv": "^16.4.5",
+		"dotenv": "^16.4.7",
 		"express": "^4.21.2",
-		"mssql": "^11.0.1"
+		"pg": "^8.13.1"
 	},
 	"scripts": {
 		"prepare": "npx ts-patch install -s",
@@ -31,6 +31,7 @@
 		"@types/express": "^5.0.0",
 		"@types/mssql": "^9.1.5",
 		"@types/node": "^22.7.7",
+		"@types/pg": "^8.11.11",
 		"babel-jest": "^29.7.0",
 		"cpx": "^1.5.0",
 		"identity-obj-proxy": "^3.0.0",

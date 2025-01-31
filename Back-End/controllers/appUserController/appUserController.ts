@@ -1,5 +1,5 @@
-import Database from "@controllers/DBController/DBController"
-import appUserTypes from "@controllers/appUserController/appUser_types"
+import Database from "@controllers/DBController/DBController";
+import appUserTypes from "@controllers/appUserController/appUser_types";
 
 async function updateAppUser(
   id: string,
@@ -9,51 +9,43 @@ async function updateAppUser(
   degree: string,
   type: appUserTypes.UserType
 ): Promise<appUserTypes.AppUser | undefined> {
-
   const conn = await Database.getConnection();
 
   if (conn) {
     try {
-      // Check if a appUser with the id exists
-      const appUser = await conn
-        .request()
-        .input('id', Database.msSQL.VarChar, id)
-        .query('SELECT * FROM AppUser WHERE id = @id');
+      // Check if the user exists
+      const appUser = await conn.query(
+        `SELECT * FROM AppUser WHERE id = $1`,
+        [id]
+      );
 
-      if (appUser.recordset.length === 0) {
-        throw new Error('AppUser with this id does not exist.');
+      if (appUser.rows.length === 0) {
+        throw new Error("AppUser with this id does not exist.");
       }
 
-      // Update the appUser with the new name and totalCredits
-      await conn
-        .request()
-        .input('id', Database.msSQL.VarChar, id)
-        .input('email', Database.msSQL.VarChar, email)
-        .input('password', Database.msSQL.VarChar, password)
-        .input('fullname', Database.msSQL.VarChar, fullname)
-        .input('degree', Database.msSQL.VarChar, degree)
-        .input('type', Database.msSQL.VarChar, type)
-        .query(
-          `UPDATE AppUser 
-            SET email = @email, 
-                password = @password, 
-                fullname = @fullname, 
-                degree = @degree, 
-                type = @type 
-            WHERE id = @id`
-        );
+      // Update the user
+      await conn.query(
+        `UPDATE AppUser 
+          SET email = $1, 
+              password = $2, 
+              fullname = $3, 
+              degree = $4, 
+              type = $5 
+          WHERE id = $6`,
+        [email, password, fullname, degree, type, id]
+      );
 
-      // Return the updated appUser
-      const updatedAppUser = await conn
-        .request()
-        .input('id', Database.msSQL.VarChar, id)
-        .query('SELECT * FROM AppUser WHERE id = @id');
+      // Fetch updated user
+      const updatedAppUser = await conn.query(
+        `SELECT * FROM AppUser WHERE id = $1`,
+        [id]
+      );
 
-      return updatedAppUser.recordset[0];
+      return updatedAppUser.rows[0]; // PostgreSQL uses `.rows`
     } catch (error) {
       throw error;
     } finally {
-      conn.close();
+      conn.release(); // PostgreSQL: Always release connection
     }
   }
 }
@@ -63,33 +55,32 @@ async function deleteAppUser(id: string): Promise<string | undefined> {
 
   if (conn) {
     try {
-      // Check if a AppUser with the given id exists
-      const appUser = await conn
-        .request()
-        .input('id', Database.msSQL.VarChar, id)
-        .query('SELECT * FROM AppUser WHERE id = @id');
+      // Check if user exists
+      const appUser = await conn.query(
+        `SELECT * FROM AppUser WHERE id = $1`,
+        [id]
+      );
 
-      if (appUser.recordset.length === 0) {
-        throw new Error('AppUser with this id does not exist.');
+      if (appUser.rows.length === 0) {
+        throw new Error("AppUser with this id does not exist.");
       }
 
-      // Delete the AppUser
-      await conn
-        .request()
-        .input('id', Database.msSQL.VarChar, id)
-        .query('DELETE FROM AppUser WHERE id = @id');
+      // Delete user
+      await conn.query(
+        `DELETE FROM AppUser WHERE id = $1`,
+        [id]
+      );
 
-      // Return success message
       return `AppUser with id ${id} has been successfully deleted.`;
     } catch (error) {
       throw error;
     } finally {
-      conn.close();
+      conn.release();
     }
   }
-};
+}
 
-//Namespace
+// Namespace
 const appUserController = {
   updateAppUser,
   deleteAppUser

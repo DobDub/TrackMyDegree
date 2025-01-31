@@ -1,5 +1,5 @@
-import Database from "@controllers/DBController/DBController"
-import DegreeTypes from "@controllers/degreeController/degree_types"
+import Database from "@controllers/DBController/DBController";
+import DegreeTypes from "@controllers/degreeController/degree_types";
 
 async function createDegree(id: string, name: string, totalCredits: number): Promise<DegreeTypes.Degree | undefined> {
   const conn = await Database.getConnection();
@@ -7,30 +7,29 @@ async function createDegree(id: string, name: string, totalCredits: number): Pro
   if (conn) {
     try {
       // Check if a degree with the same id or name already exists
-      const existingDegree = await conn.request()
-        .input('id', Database.msSQL.VarChar, id)
-        .input('name', Database.msSQL.VarChar, name)
-        .query('SELECT * FROM Degree WHERE id = @id OR name = @name');
+      const existingDegree = await conn.query(
+        'SELECT * FROM Degree WHERE id = $1 OR name = $2',
+        [id, name]
+      );
 
-      if (existingDegree.recordset.length > 0) {
+      if ((existingDegree?.rowCount ?? 0) > 0) {
         throw new Error('Degree with this id or name already exists.');
       }
 
-      await conn.request()
-        .input('id', Database.msSQL.VarChar, id)
-        .input('name', Database.msSQL.VarChar, name)
-        .input('totalCredits', Database.msSQL.Int, totalCredits)
-        .query('INSERT INTO Degree (id, name, totalCredits) VALUES (@id, @name, @totalCredits)');
+
+      await conn.query(
+        'INSERT INTO Degree (id, name, totalCredits) VALUES ($1, $2, $3)',
+        [id, name, totalCredits]
+      );
 
       return { id, name, totalCredits };
     } catch (error) {
       throw error;
     } finally {
-      conn.close()
+      conn.release();
     }
   }
 };
-
 
 async function readDegree(id: string): Promise<DegreeTypes.Degree | undefined> {
   const conn = await Database.getConnection();
@@ -38,19 +37,20 @@ async function readDegree(id: string): Promise<DegreeTypes.Degree | undefined> {
   if (conn) {
     try {
       // Check if a degree with the id exists
-      const degree = await conn.request()
-        .input('id', Database.msSQL.VarChar, id)
-        .query('SELECT * FROM Degree WHERE id = @id');
+      const degree = await conn.query(
+        'SELECT * FROM Degree WHERE id = $1',
+        [id]
+      );
 
-      if (degree.recordset.length === 0) {
+      if (degree?.rowCount === 0) { // Safe null check
         throw new Error('Degree with this id does not exist.');
       }
 
-      return degree.recordset[0];
+      return degree.rows[0];
     } catch (error) {
       throw error;
     } finally {
-      conn.close();
+      conn.release();
     }
   }
 };
@@ -60,17 +60,16 @@ async function readAllDegrees(): Promise<DegreeTypes.Degree[] | undefined> {
 
   if (conn) {
     try {
-      const degrees = await conn.request().query('SELECT * FROM Degree');
+      const degrees = await conn.query('SELECT * FROM Degree');
 
-      return degrees.recordset;
+      return degrees.rows;
     } catch (error) {
       throw error;
     } finally {
-      conn.close();
+      conn.release();
     }
   }
 };
-
 
 async function updateDegree(id: string, name: string, totalCredits: number): Promise<DegreeTypes.Degree | undefined> {
   const conn = await Database.getConnection();
@@ -78,36 +77,32 @@ async function updateDegree(id: string, name: string, totalCredits: number): Pro
   if (conn) {
     try {
       // Check if a degree with the id exists
-      const degree = await conn
-        .request()
-        .input('id', Database.msSQL.VarChar, id)
-        .query('SELECT * FROM Degree WHERE id = @id');
+      const degree = await conn.query(
+        'SELECT * FROM Degree WHERE id = $1',
+        [id]
+      );
 
-      if (degree.recordset.length === 0) {
+      if (degree?.rowCount === 0) { // Safe null check
         throw new Error('Degree with this id does not exist.');
       }
 
       // Update the degree with the new name and totalCredits
-      await conn
-        .request()
-        .input('id', Database.msSQL.VarChar, id)
-        .input('fullname', Database.msSQL.VarChar, name)
-        .input('totalCredits', Database.msSQL.Int, totalCredits)
-        .query(
-          'UPDATE Degree SET name = @fullname, totalCredits = @totalCredits WHERE id = @id'
-        );
+      await conn.query(
+        'UPDATE Degree SET name = $1, totalCredits = $2 WHERE id = $3',
+        [name, totalCredits, id]
+      );
 
       // Return the updated degree
-      const updatedDegree = await conn
-        .request()
-        .input('id', Database.msSQL.VarChar, id)
-        .query('SELECT * FROM Degree WHERE id = @id');
+      const updatedDegree = await conn.query(
+        'SELECT * FROM Degree WHERE id = $1',
+        [id]
+      );
 
-      return updatedDegree.recordset[0];
+      return updatedDegree.rows[0];
     } catch (error) {
       throw error;
     } finally {
-      conn.close();
+      conn.release();
     }
   }
 }
@@ -118,27 +113,27 @@ async function deleteDegree(id: string): Promise<string | undefined> {
   if (conn) {
     try {
       // Check if a degree with the given id exists
-      const degree = await conn
-        .request()
-        .input('id', Database.msSQL.VarChar, id)
-        .query('SELECT * FROM Degree WHERE id = @id');
+      const degree = await conn.query(
+        'SELECT * FROM Degree WHERE id = $1',
+        [id]
+      );
 
-      if (degree.recordset.length === 0) {
+      if (degree?.rowCount === 0) { // Safe null check
         throw new Error('Degree with this id does not exist.');
       }
 
       // Delete the degree
-      await conn
-        .request()
-        .input('id', Database.msSQL.VarChar, id)
-        .query('DELETE FROM Degree WHERE id = @id');
+      await conn.query(
+        'DELETE FROM Degree WHERE id = $1',
+        [id]
+      );
 
       // Return success message
       return `Degree with id ${id} has been successfully deleted.`;
     } catch (error) {
       throw error;
     } finally {
-      conn.close();
+      conn.release();
     }
   }
 };

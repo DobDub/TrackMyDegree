@@ -1,145 +1,111 @@
-import Database         from '@controllers/DBController/DBController'
-import CourseXCPTypes   from '@controllers/CourseXCPController/CourseXCP_types'
-import DB_OPS           from '@Util/DB_Ops'
-import { randomUUID }   from 'crypto'
+import CourseXCPTypes from '@controllers/CourseXCPController/CourseXCP_types';
+import DB_OPS from '@Util/DB_Ops';
+import { randomUUID } from 'crypto';
+import DBController from '@controllers/DBController/DBController'; // Import DBController
 
 const log = console.log;
 
-async function createCourseXCP(new_record: CourseXCPTypes.CourseXCP): 
-Promise <DB_OPS> {
+async function createCourseXCP(new_record: CourseXCPTypes.CourseXCP): Promise<DB_OPS> {
+  const client = await DBController.getConnection(); // Use DBController to get the client
 
-  const dbConn = await Database.getConnection();
-
-  if( dbConn ) {
+  if (client) {
     const { coursecode, coursepool_id, group_id } = new_record;
     const record_id = randomUUID();
 
     try {
-      const result = await dbConn.request()
-      .input('id'        , Database.msSQL.VarChar, record_id)
-      .input('coursecode', Database.msSQL.VarChar, coursecode)
-      .input('coursepool', Database.msSQL.VarChar, coursepool_id)
-      .input('group_id'  , Database.msSQL.VarChar || '', group_id)
-      .query('INSERT INTO CourseXCoursePool \
-              ( id, coursecode, coursepool, group_id )\
-              OUTPUT INSERTED.id\
-              VALUES\
-              (@id, @coursecode, @coursepool, @group_id)');
+      const result = await client.query(
+        'INSERT INTO "CourseXCoursePool" (id, coursecode, coursepool, group_id) ' +
+        'VALUES ($1, $2, $3, $4) RETURNING id',
+        [record_id, coursecode, coursepool_id, group_id || '']
+      );
 
-      
-      if ( undefined === result.recordset ) {
-        log("Error inserting courseXcoursepool record: " + result.recordset);
+      if (result.rows.length === 0) {
+        log("Error inserting courseXcoursepool record");
         return DB_OPS.MOSTLY_OK;
-      }
-      else {
+      } else {
         return DB_OPS.SUCCESS;
       }
-    } 
-    catch ( error ) {
+    } catch (error) {
       log("Error in courseXcoursepool creation\n", error);
+    } finally {
+      client.release(); // Release the client back to the pool
     }
-
   }
 
   return DB_OPS.FAILURE;
 }
 
-async function getAllCourseXCP(coursepool_id: string): 
-Promise<{course_codes: string[]} | undefined> {
+async function getAllCourseXCP(coursepool_id: string): Promise<{ course_codes: string[] } | undefined> {
+  const client = await DBController.getConnection(); // Use DBController to get the client
 
-  const dbConn = await Database.getConnection();
-
-  if( dbConn ) {
+  if (client) {
     try {
-      const result = await dbConn.request()
-      .input('coursepool', Database.msSQL.VarChar, coursepool_id)
-      .query('SELECT coursecode FROM CourseXCoursePool\
-              WHERE coursepool = @coursepool');
+      const result = await client.query(
+        'SELECT coursecode FROM "CourseXCoursePool" WHERE coursepool = $1',
+        [coursepool_id]
+      );
 
-      const codes = [];
-      for(let i = 0; i < result.recordset.length; i++) {
-        codes.push(result.recordset[i].coursecode)
-      }
-
-      return {
-        course_codes: codes
-      }
-    } 
-    catch ( error ) {
+      const codes = result.rows.map(row => row.coursecode);
+      return { course_codes: codes };
+    } catch (error) {
       log("Error fetching all course codes for given coursepool id\n", error);
+    } finally {
+      client.release(); // Release the client back to the pool
     }
   }
 
   return undefined;
 }
 
-async function updateCourseXCP(update_record: CourseXCPTypes.CourseXCPItem):
-Promise<DB_OPS> {
+async function updateCourseXCP(update_record: CourseXCPTypes.CourseXCPItem): Promise<DB_OPS> {
+  const client = await DBController.getConnection(); // Use DBController to get the client
 
-  const dbConn = await Database.getConnection();
-
-  if( dbConn ) {
-    const { id, coursecode, coursepool_id, group_id } = update_record; 
+  if (client) {
+    const { id, coursecode, coursepool_id, group_id } = update_record;
 
     try {
-      const result = await dbConn.request()
-      .input('id'   , Database.msSQL.VarChar, id)
-      .input('coursecode' , Database.msSQL.VarChar, coursecode)
-      .input('coursepool' , Database.msSQL.VarChar, coursepool_id)
-      .input('group_id'   , Database.msSQL.VarChar || '', group_id)
-      .query('UPDATE CourseXCoursePool  \
-              SET \
-                coursecode = @coursecode \
-                coursepool = @coursepool \
-                group_id = @group_id \
-              OUTPUT INSERTED.id \
-              WHERE   id = @id');
+      const result = await client.query(
+        'UPDATE "CourseXCoursePool" SET coursecode = $1, coursepool = $2, group_id = $3 ' +
+        'WHERE id = $4 RETURNING id',
+        [coursecode, coursepool_id, group_id || '', id]
+      );
 
-      if( (result.recordset.length > 0) && 
-          (id === result.recordset[0].id) ) {
+      if (result.rows.length > 0 && id === result.rows[0].id) {
         return DB_OPS.SUCCESS;
-      }
-      else {
+      } else {
         return DB_OPS.MOSTLY_OK;
       }
-
-    } 
-    catch (error) {
+    } catch (error) {
       log('Error in updating courseXcoursepool item\n', error);
+    } finally {
+      client.release(); // Release the client back to the pool
     }
   }
 
-  return DB_OPS.FAILURE
+  return DB_OPS.FAILURE;
 }
 
-async function removeDegreeXCP(delete_record: CourseXCPTypes.CourseXCP): 
-Promise<DB_OPS> {
-  const dbConn = await Database.getConnection();
+async function removeDegreeXCP(delete_record: CourseXCPTypes.CourseXCP): Promise<DB_OPS> {
+  const client = await DBController.getConnection(); // Use DBController to get the client
 
-  if( dbConn ) {
+  if (client) {
     const { coursecode, coursepool_id, group_id } = delete_record;
 
     try {
-      const result = await dbConn.request()
-          .input('coursecode' , Database.msSQL.VarChar, coursecode)
-          .input('coursepool' , Database.msSQL.VarChar, coursepool_id)
-          .input('group_id'   , Database.msSQL.VarChar || '', group_id)
-          .query('DELETE FROM CourseXCoursePool\
-                  OUTPUT DELETED.coursecode\
-                  WHERE coursecode = @coursecode\
-                  AND   coursepool = @coursepool\
-                  AND   group_id = @group_id');
+      const result = await client.query(
+        'DELETE FROM "CourseXCoursePool" WHERE coursecode = $1 AND coursepool = $2 AND group_id = $3 RETURNING coursecode',
+        [coursecode, coursepool_id, group_id || '']
+      );
 
-      if( (result.recordset.length > 0) && 
-          (result.recordset[0].coursecode === coursecode) ) {
+      if (result.rows.length > 0 && result.rows[0].coursecode === coursecode) {
         return DB_OPS.SUCCESS;
-      }
-      else {
+      } else {
         return DB_OPS.MOSTLY_OK;
       }
-    } 
-    catch (error) {
+    } catch (error) {
       log('Error in deleting degreeXcoursepool item\n', error);
+    } finally {
+      client.release(); // Release the client back to the pool
     }
   }
 

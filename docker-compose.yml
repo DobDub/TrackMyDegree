@@ -1,20 +1,36 @@
 version: '3.8'
 
 services:
-  tests:
-    build:
-      context: ./Back-End
-      dockerfile: Dockerfile.test
-    depends_on:
-      - backend
-      - sqlserver
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=MySecureP@ss123
+      - POSTGRES_DB=master
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./entrypoint-sql.sh:/usr/src/app/entrypoint-sql.sh
+    entrypoint: ["/bin/sh", "/usr/src/app/entrypoint-sql.sh"]
     networks:
       - app-network
-    entrypoint: >
-      sh -c "
-      ./ping-backend.sh &&
-      npm test
-      "
+
+  backend:
+    build:
+      context: ./Back-End
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_USER=sa
+      - POSTGRES_PASSWORD=MySecureP@ss123
+      - POSTGRES_DB=master
+    depends_on:
+      - postgres
+    networks:
+      - app-network
 
   frontend:
     build:
@@ -24,36 +40,25 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    networks:
+      - app-network
 
-  backend:
+  tests:
     build:
       context: ./Back-End
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    environment:
-      - SQL_SERVER_HOST=sqlserver
-      - SQL_SERVER_USER=sa
-      - SQL_SERVER_PASSWORD=MySecureP@ss123
-      - SQL_SERVER_DATABASE=master
+      dockerfile: Dockerfile.test
     depends_on:
-      - sqlserver
-
-
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:2019-latest
-    environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=MySecureP@ss123
-      - MSSQL_PID=Developer
-    ports:
-      - "1433:1433"
-    volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./entrypoint-sql.sh:/usr/src/app/entrypoint-sql.sh
-    command: chmod +x entrypoint.sh
-    entrypoint: ["/bin/sh", "/usr/src/app/entrypoint-sql.sh"]
+      - backend
+      - postgres
+    networks:
+      - app-network
+    entrypoint: >
+      sh -c "
+      ./ping-backend.sh &&
+      npm test
+      "
 
 networks:
   app-network:
+    name: trackmydegree_app-network
     driver: bridge
