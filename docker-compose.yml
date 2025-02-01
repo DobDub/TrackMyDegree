@@ -4,15 +4,13 @@ services:
   postgres:
     image: postgres:latest
     environment:
-      - POSTGRES_USER=sa
-      - POSTGRES_PASSWORD=MySecureP@ss123
-      - POSTGRES_DB=master
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: sa
+      POSTGRES_PASSWORD: MySecureP@ss123
+      POSTGRES_DB: master
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
-      - ./entrypoint-sql.sh:/usr/src/app/entrypoint-sql.sh
-    entrypoint: ["/bin/sh", "/usr/src/app/entrypoint-sql.sh"]
+    ports:
+      - "5432:5432"
     networks:
       - app-network
 

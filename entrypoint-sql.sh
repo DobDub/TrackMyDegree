@@ -1,16 +1,8 @@
 #!/bin/bash
 
-# Wait for PostgreSQL to start up
-echo "Waiting for PostgreSQL to start..."
-until pg_isready -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB"; do
-  echo "Waiting for PostgreSQL to be available..."
-  sleep 2
-done
+sleep 15
 
-echo "PostgreSQL is up and running."
+psql -U sa -d master -f /docker-entrypoint-initdb.d/init.sql
 
-# Run the initialization script
-PGPASSWORD="$POSTGRES_PASSWORD" psql -h "$POSTGRES_HOST" -U "$POSTGRES_USER" -d "$POSTGRES_DB" -f /docker-entrypoint-initdb.d/init.sql
-
-# Keep the container running
-tail -f /dev/null
+# Optionally, run any verification or additional scripts
+# /wait-for-it.sh postgres:5432 --timeout=30 --strict -- echo "PostgreSQL is still available"

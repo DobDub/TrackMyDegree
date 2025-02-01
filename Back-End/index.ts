@@ -15,7 +15,7 @@ import degreeRouter from "@routes/degree";
 import timelineRouter from "@routes/timeline";
 import coursepoolRouter from "@routes/coursepool";
 import userDataRouter from "@routes/userData";
-//import Admin from "@routes/adminRoutes";
+import Admin from "@routes/adminRoutes";
 import requisiteRouter from "@routes/requisite";
 
 // Dev Constants
@@ -71,7 +71,7 @@ app.use("/deficiency", deficiencyRouter);
 app.use("/timeline", timelineRouter);
 app.use("/coursepool", coursepoolRouter);
 app.use("/data", userDataRouter);
-//app.use("/admin", Admin);
+app.use("/admin", Admin);
 app.use("/requisite", requisiteRouter);
 
 /**
