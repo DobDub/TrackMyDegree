@@ -628,3 +628,7 @@
   color: #999;
   opacity: 0.8;
 }
+
+.hidden-course {
+  display: none !important;
+}
