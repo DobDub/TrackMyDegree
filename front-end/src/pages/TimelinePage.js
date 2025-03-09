@@ -949,7 +949,7 @@ const TimelinePage = ({ onDataProcessed, degreeid, timelineData, creditsrequired
       console.log(timelineData);
       let name = localStorage.getItem("Timeline_Name");
       // Prompt the user for the name of the timeline
-      if (!name) {
+      if (!name || name.trim() === "") {
         name = prompt("Please enter a name for your timeline:");
       }
 
