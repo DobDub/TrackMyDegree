@@ -340,11 +340,10 @@ const UserPage = ({ onDataProcessed }) => {
 
 
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-6 rounded-md shadow-md w-96">
-            <h2 className="text-lg font-bold mb-4">Upload Your Photo</h2>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+            <div className="bg-white p-6 rounded-md shadow-md w-96 z-50">
+              <h2 className="text-lg font-bold mb-4">Upload Your Photo</h2>
 
-            {/* 🔹 Drag & Drop Area */}
             <div
               onDrop={handleDrop}
               onDragOver={(e) => e.preventDefault()}
@@ -362,7 +361,6 @@ const UserPage = ({ onDataProcessed }) => {
               )}
             </div>
 
-            {/* 🔹 Hidden File Input */}
             <input
               type="file"
               accept="image/*"
@@ -371,7 +369,6 @@ const UserPage = ({ onDataProcessed }) => {
               className="hidden"
             />
 
-            {/* 🔹 Upload & Close Buttons */}
             <div className="flex justify-between mt-4">
               <button
                 className="bg-red-500 text-white px-4 py-2 rounded-md"
@@ -382,7 +379,7 @@ const UserPage = ({ onDataProcessed }) => {
               <button
                 className="bg-green-500 text-white px-4 py-2 rounded-md"
                 onClick={() => {
-                  alert("Image Uploaded!"); // Replace with actual upload logic
+                  alert("Image Uploaded!");
                   setIsOpen(false);
                 }}
               >
