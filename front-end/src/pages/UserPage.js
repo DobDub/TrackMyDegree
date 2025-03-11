@@ -1,5 +1,5 @@
 // src/pages/UserPage.js
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext";
 import moment from "moment";
@@ -19,6 +19,10 @@ const UserPage = ({ onDataProcessed }) => {
 
   const [isEditing, setIsEditing] = useState(false);
   const [editedUserInfo, setEditedUserInfo] = useState(null);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const fileInputRef = useRef(null);
 
   const navigate = useNavigate();
 
@@ -125,7 +129,33 @@ const UserPage = ({ onDataProcessed }) => {
     setEditedUserInfo(updatedValues);
   };
 
-  // add way to get user timelines here
+  const handleDrop = (event) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    if (file) handleFileUpload(file);
+  };
+
+  const handleFileUpload = (file) => {
+    if (!file.type.startsWith("image/")) {
+      alert("Please upload an image file.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setSelectedImage(e.target.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleFileSelect = (event) => {
+    const file = event.target.files[0];
+    if (file) handleFileUpload(file);
+  };
+
+  useEffect(() => {
+    console.log("isOpen state changed:", isOpen);
+  }, [isOpen]);
+
   const [userTimelines, setUserTimelines] = useState([]);
 
   useEffect(() => {
@@ -253,6 +283,15 @@ const UserPage = ({ onDataProcessed }) => {
                         </tr>
                       </tbody>
                     </table>
+                    <button
+                      onClick={() => {
+                        console.log("Opening Modal...");
+                        setIsOpen(true);
+                      }}
+                      className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                    >
+                      Change User Avatar
+                    </button>
                   </div>
                 </div>
               </div>
@@ -298,6 +337,61 @@ const UserPage = ({ onDataProcessed }) => {
             )}
           </div>
         </div>
+
+
+      {isOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-6 rounded-md shadow-md w-96">
+            <h2 className="text-lg font-bold mb-4">Upload Your Photo</h2>
+
+            {/* 🔹 Drag & Drop Area */}
+            <div
+              onDrop={handleDrop}
+              onDragOver={(e) => e.preventDefault()}
+              className="border-2 border-dashed border-gray-400 p-10 text-center cursor-pointer"
+              onClick={() => fileInputRef.current.click()}
+            >
+              {selectedImage ? (
+                <img
+                  src={selectedImage}
+                  alt="Preview"
+                  className="w-full h-32 object-cover rounded-md"
+                />
+              ) : (
+                <p>Drag & Drop your photo here or click to select</p>
+              )}
+            </div>
+
+            {/* 🔹 Hidden File Input */}
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+              className="hidden"
+            />
+
+            {/* 🔹 Upload & Close Buttons */}
+            <div className="flex justify-between mt-4">
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded-md"
+                onClick={() => setIsOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-green-500 text-white px-4 py-2 rounded-md"
+                onClick={() => {
+                  alert("Image Uploaded!"); // Replace with actual upload logic
+                  setIsOpen(false);
+                }}
+              >
+                Upload
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
         {/* Delete Confirm Modal */}
         <DeleteModal open={showModal} onClose={() => setShowModal(false)}>
