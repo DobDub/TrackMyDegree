@@ -340,8 +340,8 @@ const UserPage = ({ onDataProcessed }) => {
 
 
       {isOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-            <div className="bg-white p-6 rounded-md shadow-md w-96 z-50">
+        <div className="modal-overlay">
+          <div className="modal-content">
               <h2 className="text-lg font-bold mb-4">Upload Your Photo</h2>
 
             <div
@@ -371,7 +371,7 @@ const UserPage = ({ onDataProcessed }) => {
 
             <div className="flex justify-between mt-4">
               <button
-                className="bg-red-500 text-white px-4 py-2 rounded-md"
+                className="modal-close-btn"
                 onClick={() => setIsOpen(false)}
               >
                 Cancel
