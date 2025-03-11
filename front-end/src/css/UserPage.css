@@ -225,8 +225,6 @@
     height: 100%;
   }
 
-
-
 .modal-overlay {
   position: fixed; 
   top: 0;
@@ -252,10 +250,24 @@
   animation: fadeIn 0.3s ease-in-out;
 }
 
+.upload-button {
+  background-color: #800020;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease-in-out;
+}
+
+.upload-button:hover {
+  background-color: #600018;
+}
+
 
 .modal-close-btn {
-  background: red;
-  color: white;
+  background: white;
+  color: red;
   border: none;
   padding: 10px 20px;
   margin-top: 10px;
@@ -265,7 +277,7 @@
 
 
 .modal-close-btn:hover {
-  background: darkred;
+  background: rgb(249, 240, 240);
 }
 
 

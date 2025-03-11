@@ -288,7 +288,8 @@ const UserPage = ({ onDataProcessed }) => {
                         console.log("Opening Modal...");
                         setIsOpen(true);
                       }}
-                      className="bg-blue-500 text-white px-4 py-2 rounded-md"
+                        style={{ backgroundColor: "#800020", color: "white" }}
+                        className="px-4 py-2 rounded-md"
                     >
                       Change User Avatar
                     </button>
@@ -342,7 +343,7 @@ const UserPage = ({ onDataProcessed }) => {
       {isOpen && (
         <div className="modal-overlay">
           <div className="modal-content">
-              <h2 className="text-lg font-bold mb-4">Upload Your Photo</h2>
+              <h2>Upload Your Photo</h2>
 
             <div
               onDrop={handleDrop}
@@ -377,7 +378,7 @@ const UserPage = ({ onDataProcessed }) => {
                 Cancel
               </button>
               <button
-                className="bg-green-500 text-white px-4 py-2 rounded-md"
+                className="upload-button"
                 onClick={() => {
                   alert("Image Uploaded!");
                   setIsOpen(false);
