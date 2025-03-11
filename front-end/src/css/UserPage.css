@@ -254,30 +254,31 @@
   background-color: #800020;
   color: white;
   padding: 10px 20px;
-  border: none;
+  border: 2px solid #800020;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.3s ease-in-out;
 }
 
 .upload-button:hover {
-  background-color: #600018;
+  background-color: #b86a7d;
 }
 
 
 .modal-close-btn {
   background: white;
   color: red;
-  border: none;
+  border: 2px solid red;
   padding: 10px 20px;
+  margin-right: 10px;
   margin-top: 10px;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 6px;
 }
 
 
 .modal-close-btn:hover {
-  background: rgb(249, 240, 240);
+  background: rgb(175, 110, 110);
 }
 
 

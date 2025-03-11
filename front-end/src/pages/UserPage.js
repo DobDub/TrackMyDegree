@@ -288,7 +288,7 @@ const UserPage = ({ onDataProcessed }) => {
                         console.log("Opening Modal...");
                         setIsOpen(true);
                       }}
-                        style={{ backgroundColor: "#800020", color: "white" }}
+                        style={{ backgroundColor: "#800020", color: "white", borderRadius: "6px" }}
                         className="px-4 py-2 rounded-md"
                     >
                       Change User Avatar
