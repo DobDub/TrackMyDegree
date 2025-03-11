@@ -65,6 +65,7 @@ CREATE TABLE AppUser (  -- Use square brackets for reserved keywords
     password VARCHAR(255) NOT NULL,
     fullname VARCHAR(255) NOT NULL,
     degree VARCHAR(255),
+    user_avatar LONGBLOB,
     type VARCHAR(10) CHECK (type IN ('student', 'advisor', 'admin')) NOT NULL,
     FOREIGN KEY (degree) REFERENCES Degree(id)
 );

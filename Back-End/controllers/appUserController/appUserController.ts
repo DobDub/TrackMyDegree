@@ -89,6 +89,41 @@ async function deleteAppUser(id: string): Promise<string | undefined> {
   }
 };
 
+
+async function uploadAppUserAvatar(id: string, user_avatar: string ): Promise<string | undefined> {
+  const conn = await Database.getConnection();
+
+  if (conn) {
+    try {
+      // Check if a AppUser with the given id exists
+      const appUser = await conn
+        .request()
+        .input('id', Database.msSQL.VarChar, id)
+        .input('user_avatar', Database.msSQL.VarChar, user_avatar)
+        .query('SELECT * FROM AppUser WHERE id = @id');
+
+      if (appUser.recordset.length === 0) {
+        throw new Error('AppUser with this id does not exist.');
+      }
+
+      // Delete the AppUser
+      await conn
+        .request()
+        .input('id', Database.msSQL.VarChar, id)
+        .query(`UPDATE AppUser 
+            SET user_avatar = @user_avatar
+            WHERE id = @id`);
+
+      // Return success message
+      return `AppUser with id ${id} has been successfully uploaded.`;
+    } catch (error) {
+      throw error;
+    } finally {
+      conn.close();
+    }
+  }
+};
+
 //Namespace
 const appUserController = {
   updateAppUser,

@@ -17,11 +17,11 @@ const UserPage = ({ onDataProcessed }) => {
   const { user } = useContext(AuthContext);
   const [userInfo, setUserInfo] = useState([]);
 
-  const [isEditing, setIsEditing] = useState(false);
   const [editedUserInfo, setEditedUserInfo] = useState(null);
 
   const [isOpen, setIsOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const fileInputRef = useRef(null);
 
   const navigate = useNavigate();
@@ -41,56 +41,6 @@ const UserPage = ({ onDataProcessed }) => {
     }
   }, [userInfo]);
 
-  const startEditing = () => {
-    setIsEditing(true);
-  };
-
-  const cancelEditing = () => {
-    setEditedUserInfo(userInfo.map((item) => item.value));
-    setIsEditing(false);
-  };
-
-  const saveChanges = async () => {
-    // add way to save changes here
-    const updatedInfo = userInfo.map((item, index) => ({
-      ...item,
-      value: editedUserInfo[index],
-    }));
-    try {
-      // Construct the payload
-      const payload = {
-        id: user.id,
-        fullname: updatedInfo[0].value,
-        email: updatedInfo[1].value,
-        type: user.type,
-      };
-
-      // Make the POST request to update user info
-      const response = await fetch(
-        `${process.env.REACT_APP_SERVER}/appUser/update`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (response.ok) {
-        console.log("User info updated successfully!");
-        setUserInfo(updatedInfo);
-        setIsEditing(false);
-      } else {
-        const errorData = await response.json();
-        console.error("Failed to update user info.", errorData);
-        setIsEditing(false);
-      }
-    } catch (error) {
-      console.error("Error updating user info:", error);
-      setIsEditing(false);
-    }
-  };
 
   const handleTimelineClick = (obj) => {
     const transcriptData = [];
@@ -123,33 +73,52 @@ const UserPage = ({ onDataProcessed }) => {
     navigate("/timeline_change");
   };
 
-  const handleInputChange = (e, index) => {
-    const updatedValues = [...editedUserInfo];
-    updatedValues[index] = e.target.value;
-    setEditedUserInfo(updatedValues);
-  };
-
   const handleDrop = (event) => {
     event.preventDefault();
     const file = event.dataTransfer.files[0];
-    if (file) handleFileUpload(file);
+    if (file && file.type === "image/png") {
+      setSelectedFile(file);
+    } else {
+      alert("Please upload a PNG file.");
+    }
+
   };
 
-  const handleFileUpload = (file) => {
-    if (!file.type.startsWith("image/")) {
-      alert("Please upload an image file.");
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      alert("Please select a PNG file before uploading.");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setSelectedImage(e.target.result);
-    };
-    reader.readAsDataURL(file);
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+      const response = await fetch(`${process.env.REACT_APP_SERVER}/api/upload`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert("Image uploaded successfully!");
+        console.log("Server response:", data);
+      } else {
+        alert("Upload failed: " + data.message);
+      }
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      alert("An error occurred while uploading.");
+    }
   };
 
   const handleFileSelect = (event) => {
     const file = event.target.files[0];
-    if (file) handleFileUpload(file);
+    if (file && file.type === "image/png") {
+      setSelectedFile(file);
+    } else {
+      alert("Please upload a valid PNG file.");
+    }
   };
 
   useEffect(() => {
@@ -380,7 +349,7 @@ const UserPage = ({ onDataProcessed }) => {
               <button
                 className="upload-button"
                 onClick={() => {
-                  alert("Image Uploaded!");
+                  handleUpload();
                   setIsOpen(false);
                 }}
               >
