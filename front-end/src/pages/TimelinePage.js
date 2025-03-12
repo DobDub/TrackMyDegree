@@ -1,6 +1,7 @@
 // TimelinePage.js
 
 import React, { useState, useContext, useEffect, useRef } from 'react';
+import InsightsPopup from '../components/InsightsPopup'; // Import the new pop-up component
 import { useNavigate } from 'react-router-dom';
 import { motion, time } from "framer-motion"
 import {
@@ -148,6 +149,7 @@ const TimelinePage = ({ degreeid, timelineData, creditsrequired, isExtendedCredi
   const navigate = useNavigate();
   const [showCourseList, setShowCourseList] = useState(true);
   const [showCourseDescription, setShowCourseDescription] = useState(true);
+  const [showInsightsPopup, setShowInsightsPopup] = useState(false); 
 
   const [semesters, setSemesters] = useState([]);
   const [semesterCourses, setSemesterCourses] = useState({});
@@ -1220,6 +1222,18 @@ const TimelinePage = ({ degreeid, timelineData, creditsrequired, isExtendedCredi
                 <h4>
                   Total Credits Earned: {totalCredits} / {creditsRequired + deficiencyCredits}
                 </h4>
+
+                  {/* Add the "Show Insights" button here */}
+                  <button
+                  className="show-insights-button"
+                 onClick={() => {
+      // Placeholder for future functionality
+              console.log("Show Insights clicked");
+              setShowInsightsPopup(true);
+               }}
+              >
+        Show Insights
+        </button>
                 {/* Save Timeline Button */}
                 <button
                   className="save-timeline-button"
@@ -1229,6 +1243,11 @@ const TimelinePage = ({ degreeid, timelineData, creditsrequired, isExtendedCredi
                   Save Timeline
                 </button>
               </div>
+
+               {/* Render the Insights Pop-up if showInsightsPopup is true */}
+               {showInsightsPopup && (
+                <InsightsPopup onClose={() => setShowInsightsPopup(false)} />
+              )}
 
               <div className="timeline-page">
 

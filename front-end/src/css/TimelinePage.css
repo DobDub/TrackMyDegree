@@ -671,3 +671,65 @@
 .hidden-course {
   display: none;
 }
+
+
+/* Add this to your CSS file */
+.show-insights-button {
+  background-color: #4CAF50; /* Green background */
+  color: white; /* White text */
+  padding: 10px 20px; /* Padding */
+  border: none; /* Remove border */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  margin-left: 375px; /* Space between buttons */
+}
+
+.show-insights-button:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+.insights-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it's above other content */
+}
+
+.insights-popup-content {
+  background-color: white;
+  padding: 40px; /* Increased padding */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  max-width: 600px; /* Increased width */
+  width: 90%; /* Responsive width */
+  min-height: 50px; /* Increased height */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center content vertically */
+}
+
+.insights-popup-content h2 {
+  font-size: 2rem; /* Larger heading */
+  margin-bottom: 20px; /* Add spacing below heading */
+}
+
+.close-popup-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.close-popup-button:hover {
+  background-color: #45a049;
+}
