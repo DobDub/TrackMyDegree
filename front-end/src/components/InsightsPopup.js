@@ -1,5 +1,5 @@
 import React from 'react';
-import '../css/TimelinePage.css';
+import '../css/InsightsPopup.css';
 import ProgressChart from './ProgressChart'; // Import the chart component
 
 
