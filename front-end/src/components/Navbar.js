@@ -7,7 +7,6 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import '../css/Navbar.css';
 import userIcon from "../icons/userIcon2.png";
 import logoutIcon from "../icons/logoutIcon.png";
-import {color} from "framer-motion"; // New logout icon
 
 const Navbar = () => {
   const { isLoggedIn, logout, user } = useContext(AuthContext);

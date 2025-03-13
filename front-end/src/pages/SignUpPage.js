@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Button from 'react-bootstrap/Button';
-import Dropdown from "react-bootstrap/Dropdown";
 import {motion} from "framer-motion"
 
 function SignUpPage() {

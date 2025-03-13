@@ -37,6 +37,7 @@ const UserPage = ({ onDataProcessed }) => {
     }
   }, [userInfo]);
 
+  /*
   const startEditing = () => {
     setIsEditing(true);
   };
@@ -87,6 +88,7 @@ const UserPage = ({ onDataProcessed }) => {
       setIsEditing(false);
     }
   };
+  */
 
   const handleTimelineClick = (obj) => {
     const transcriptData = [];
@@ -117,12 +119,6 @@ const UserPage = ({ onDataProcessed }) => {
     });
     localStorage.setItem("Timeline_Name", obj.name);
     navigate("/timeline_change");
-  };
-
-  const handleInputChange = (e, index) => {
-    const updatedValues = [...editedUserInfo];
-    updatedValues[index] = e.target.value;
-    setEditedUserInfo(updatedValues);
   };
 
   // add way to get user timelines here

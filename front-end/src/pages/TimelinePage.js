@@ -1,8 +1,8 @@
 // TimelinePage.js
 
-import React, { useState, useContext, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, time } from "framer-motion"
+import { motion } from "framer-motion"
 import {
   DndContext,
   useDraggable,
@@ -220,31 +220,12 @@ const TimelinePage = ({ degreeid, timelineData, creditsrequired, isExtendedCredi
   const toggleCourseDescription = () => setShowCourseDescription((prev) => !prev);
 
   const [allCourses, setAllCourses] = useState([]);
-  const [showExempted, setShowExempted] = useState(true);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [timelineName, setTimelineName] = useState('');
   const [tempName, setTempName] = useState('');
 
 
-  let DEFAULT_EXEMPTED_COURSES = [];
-  if (!extendedCredit) {
-    DEFAULT_EXEMPTED_COURSES = [
-      'MATH201',
-      'MATH203',
-      'MATH204',
-      'MATH205',
-      'MATH206',
-      'CHEM205',
-      'PHYS204',
-      'PHYS205',
-    ]
-  }
-  else {
-    DEFAULT_EXEMPTED_COURSES = [
-      'MATH201',
-      'MATH206',
-    ]
-  }
+
 
   // NEW: Fetch all courses from /courses/getAllCourses
   useEffect(() => {
@@ -1095,7 +1076,7 @@ const TimelinePage = ({ degreeid, timelineData, creditsrequired, isExtendedCredi
 
     // Save deficiency courses.
     try {
-      const responseDeficiency = await fetch(`${process.env.REACT_APP_SERVER}/deficiency/create`, {
+      await fetch(`${process.env.REACT_APP_SERVER}/deficiency/create`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
