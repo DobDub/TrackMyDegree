@@ -733,3 +733,149 @@
 .close-popup-button:hover {
   background-color: #45a049;
 }
+
+/* Style the insights section */
+.insights-section {
+  max-width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+/* Container for all course pool charts with horizontal scrolling */
+.course-pool-charts {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6rem;
+  justify-content: flex-start;
+  overflow-x: auto;
+  padding-bottom: 2rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+  white-space: nowrap;
+}
+
+/* Hide the scrollbar in Webkit browsers for a cleaner look */
+.course-pool-charts::-webkit-scrollbar {
+  height: 8px;
+}
+
+.course-pool-charts::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.course-pool-charts::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.course-pool-charts::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Style for each chart container */
+.chart-container {
+  flex: 0 0 auto;
+  width: 240px;
+  min-width: 240px;
+  max-width: 240px;
+  height: 450px; /* Fixed height to ensure consistency */
+  text-align: center;
+  padding: 1rem 0;
+  position: relative;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between; /* Distribute space evenly */
+}
+
+/* Style the chart titles */
+.chart-container h6 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 4rem; /* Limit title height */
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Limit to 3 lines */
+  -webkit-box-orient: vertical;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+/* Ensure the PieChart fits within its container */
+.chart-container .recharts-wrapper {
+  width: 200px !important;
+  height: 200px !important;
+  max-height: 200px !important;
+  margin: 0 auto;
+  display: block;
+  overflow: visible;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+/* Style the credits text below the chart */
+.chart-container p {
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  color: #555;
+  text-align: center;
+  position: relative;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+/* Style for the Total Credits Progress chart */
+.insights-section .chart-container:last-child {
+  flex: 0 0 auto;
+  width: 300px;
+  min-width: 300px;
+  max-width: 300px;
+  height: auto; /* Allow height to adjust for this chart */
+  margin: 3rem auto;
+  display: block;
+}
+
+.insights-section .chart-container:last-child .recharts-wrapper {
+  height: 300px !important;
+  max-height: 300px !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .course-pool-charts {
+    gap: 4rem;
+    padding-bottom: 1rem;
+  }
+
+  .chart-container {
+    width: 220px;
+    min-width: 220px;
+    max-width: 220px;
+    height: 430px; /* Slightly smaller height on mobile */
+  }
+
+  .chart-container h6 {
+    max-height: 4.5rem; /* Slightly taller to accommodate wrapping */
+  }
+
+  .chart-container .recharts-wrapper {
+    width: 180px !important;
+    height: 180px !important;
+    max-height: 180px !important;
+  }
+
+  .insights-section .chart-container:last-child {
+    width: 250px;
+    min-width: 250px;
+    max-width: 250px;
+    margin: 2rem auto;
+  }
+
+  .insights-section .chart-container:last-child .recharts-wrapper {
+    height: 250px !important;
+    max-height: 250px !important;
+  }
+}
