@@ -1319,7 +1319,7 @@ const TimelinePage = ({
 
               <div className="timeline-page">
 
-              {showInsights ? (
+                  {showInsights ? (
   <div className="insights-section">
     <h2>Progress Insights</h2>
     <hr style={{ marginBottom: '1rem' }} />
