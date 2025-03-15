@@ -1,39 +1,134 @@
-.insights-popup-overlay {
+/* InsightsPopup.css */
+
+.popup-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  background: rgba(0, 0, 0, 0.5); /* Darkened background */
   display: flex;
+  justify-content: center;
   align-items: center;
-  z-index: 1000; /* Ensure it's above other content */
+  z-index: 2000; /* Increased to ensure it sits above all content */
+  pointer-events: auto; /* Allow interaction with popup */
+  animation: fadeIn 0.3s ease-in-out; /* Fade-in animation */
 }
 
-.insights-popup-content {
-  background-color: rgb(255, 255, 255);
-  padding-top: 100px;
-  padding-right: 1400px;
-  padding-left: 100px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 90vh; /* 90% of viewport width */
-  height: 90vh; /* 90% of viewport height */
+.popup-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 85vw; /* 85% of viewport width */
+  max-height: 85vh; /* 85% of viewport height */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
   display: flex;
-  flex-direction: column; /* Center content horizontally */
-  overflow: auto; /* Add scroll if content overflows */
+  flex-direction: column;
+  overflow-y: auto;
+  z-index: 2001; /* Ensure content is above overlay */
+  animation: slideIn 0.3s ease-in-out; /* Slide-in animation */
 }
 
-.close-popup-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background-color: #4CAF50;
+.close-btn-x {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #333;
+  padding: 0;
+  line-height: 1;
+  z-index: 2002; /* Above popup content */
+}
+
+.close-btn-x:hover {
+  color: #007bff;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center;
+}
+
+.charts-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.overall-progress {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.close-btn {
+  background-color: #007bff;
   color: white;
   border: none;
+  padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 1rem;
+  align-self: center;
+  margin-top: 15px;
 }
 
-.close-popup-button:hover {
-  background-color: #45a049;
+.close-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .popup-content {
+    width: 95%;
+    padding: 15px;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  .close-btn-x {
+    top: 5px;
+    right: 5px;
+    font-size: 1.2rem;
+  }
+
+  .charts-container {
+    gap: 10px;
+  }
+
+  .close-btn {
+    width: 100%;
+    margin-top: 10px;
+  }
 }

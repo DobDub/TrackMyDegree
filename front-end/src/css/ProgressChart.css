@@ -1,0 +1,42 @@
+/* ProgressChart.css */
+
+.chart-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 180px; /* Reduced from 200px */
+  margin: 5px; /* Reduced margin for compactness */
+  text-align: center;
+}
+
+.chart-title {
+  font-size: 0.9rem; /* Reduced font size */
+  margin-bottom: 5px;
+  color: #333;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.progress-text {
+  font-size: 0.8rem; /* Reduced font size */
+  color: #666;
+  margin-top: 3px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .chart-wrapper {
+    width: 160px; /* Reduced from 180px */
+  }
+
+  .chart-title {
+    font-size: 0.8rem;
+  }
+
+  .progress-text {
+    font-size: 0.7rem;
+  }
+}
