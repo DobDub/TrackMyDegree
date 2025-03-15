@@ -1318,6 +1318,56 @@ const TimelinePage = ({
               </div>
 
               <div className="timeline-page">
+
+              {showInsights ? (
+  <div className="insights-section">
+    <h2>Progress Insights</h2>
+    <hr style={{ marginBottom: '1rem' }} />
+
+    {/* Course Pool Progress Charts */}
+    <h5>Course Pool Progress</h5>
+    <div className="course-pool-charts">
+      {calculatePoolProgress().map((pool, index) => (
+        <div key={index} className="chart-container">
+          <h6>{pool.poolName}</h6>
+          <PieChart width={500} height={200}>
+            <Pie
+              data={pool.data}
+              cx="50%"
+              cy="50%"
+              innerRadius={120}
+              outerRadius={250}
+              fill="#8884d8"
+              dataKey="value"
+              labelLine={true}
+              label={({ percent, cx, cy, midAngle, outerRadius }) => {
+                const RADIAN = Math.PI / 180;
+                const radius = outerRadius + 20;
+                const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                return (
+                  <text
+                    x={x}
+                    y={y}
+                    fill="#333"
+                    textAnchor={x > cx ? 'start' : 'end'}
+                    dominantBaseline="central"
+                  >
+                    {`${(percent * 100).toFixed(0)}%`}
+                  </text>
+                );
+              }}
+            >
+              <Cell key="completed" fill="#4a90e2" />
+              <Cell key="remaining" fill="#d3d3d3" />
+            </Pie>
+            <Tooltip formatter={(value, name) => `${name}: ${value} credits`} />
+          </PieChart>
+          <p>{pool.data[0].value} / {pool.maxCredits} credits</p>
+        </div>
+      ))}
+    </div>
+
                 <Droppable
                   className="courses-with-button"
                   id="courses-with-button"
