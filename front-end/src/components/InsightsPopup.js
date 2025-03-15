@@ -1,20 +1,46 @@
+// InsightsPopup.js
+
 import React from 'react';
-import '../css/InsightsPopup.css';
-import ProgressChart from './ProgressChart'; // Import the chart component
+import ProgressChart from './ProgressChart';
 
+const InsightsPopup = ({ onClose, poolCredits }) => {
+  const totalCreditsEarned = Object.values(poolCredits).reduce(
+    (sum, pool) => sum + (pool.creditsEarned || 0),
+    0
+  );
+  const totalCreditsRequired = poolCredits.deficiency
+    ? 120 + poolCredits.deficiency.totalCredits
+    : 120;
 
-
-const InsightsPopup = ({ onClose }) => {
   return (
-    <div className="insights-popup-overlay">
-      <div className="insights-popup-content">
+    <div className="popup-overlay">
+      <div className="popup-content">
+        <button className="close-btn-x" onClick={onClose}>
+          ×
+        </button>
         <h2>Progress Overview</h2>
-
-        {/* Render the Progress Chart */}
-        <ProgressChart />
-
-        {/* Close Button */}
-        <button onClick={onClose} className="close-popup-button">
+        <div className="charts-container">
+          <div className="overall-progress">
+            <ProgressChart
+              type="pie"
+              poolName="Overall Progress"
+              creditsEarned={totalCreditsEarned}
+              totalCredits={totalCreditsRequired}
+            />
+          </div>
+          {Object.entries(poolCredits).map(([poolId, { poolName, creditsEarned, totalCredits }]) => (
+            poolId !== 'deficiency' && (
+              <ProgressChart
+                key={poolId}
+                type="bar"
+                poolName={poolName}
+                creditsEarned={creditsEarned}
+                totalCredits={totalCredits || creditsEarned}
+              />
+            )
+          ))}
+        </div>
+        <button className="close-btn" onClick={onClose}>
           Close
         </button>
       </div>

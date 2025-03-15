@@ -1,61 +1,71 @@
+// ProgressChart.js
+
 import React from 'react';
-import { PieChart, Pie, Cell, Tooltip, Legend, RadialBarChart, RadialBar } from 'recharts';
+import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-const ProgressChart = () => {
-  // Hardcoded data for testing
-  const coursePoolProgress = [
-    { name: 'Core Courses', creditsEarned: 40, totalCredits: 69.5 },
-    { name: 'Electives', creditsEarned: 10, totalCredits: 20 },
-    { name: 'General Education', creditsEarned: 3, totalCredits: 3 },
-  ];
+const ProgressChart = ({ type, poolName, creditsEarned, totalCredits }) => {
+  const data = [
+    { name: 'Credits Earned', value: creditsEarned },
+    { name: 'Remaining Credits', value: totalCredits ? totalCredits - creditsEarned : 0 },
+  ].filter(d => d.value >= 0);
 
-  const totalCreditsData = [
-    { name: 'Total Credits', value: 53, total: 120 }, // Hardcoded values
-  ];
+  if (type === 'pie') {
+    const COLORS = ['#0088FE', '#00C49F'];
+    return (
+      <div className="chart-wrapper">
+        <div className="chart-title">{poolName}</div>
+        <ResponsiveContainer width="100%" height={180}>
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              innerRadius={0}
+              outerRadius={70} // Fixed comment syntax
+              fill="#8884d8"
+              dataKey="value"
+              labelLine={false}
+              label={({ name, value }) => `${name}: ${value} credits`}
+            >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    );
+  }
 
-  // Colors for the pie chart segments
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28'];
+  if (type === 'bar') {
+    return (
+      <div className="chart-wrapper">
+        <div className="chart-title">{poolName}</div>
+        <ResponsiveContainer width="100%" height={30}>
+          <BarChart data={data} layout="vertical">
+            <XAxis type="number" domain={[0, totalCredits || creditsEarned]} hide={true} /> {/* Fixed hide prop */}
+            <YAxis type="category" dataKey="name" hide={true} /> {/* Fixed hide prop */}
+            <Bar dataKey="value" fill="#0088FE">
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} />
+              ))}
+            </Bar>
+            <Tooltip
+              formatter={(value) => `${value} credits`}
+              labelFormatter={() => ''}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+        <div className="progress-text">
+          {creditsEarned} / {totalCredits || '∞'} credits
+        </div>
+      </div>
+    );
+  }
 
-  return (
-    <div>
-      {/* Pie Chart for Course Pool Progress */}
-      <h3>Course Pool Progress</h3>
-      <PieChart width={400} height={400}>
-        <Pie
-          data={coursePoolProgress}
-          cx="50%"
-          cy="50%"
-          outerRadius={150}
-          fill="#8884d8"
-          dataKey="creditsEarned"
-          nameKey="name"
-          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-        >
-          {coursePoolProgress.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-          ))}
-        </Pie>
-        <Tooltip />
-        <Legend />
-      </PieChart>
-
-      {/* Circle Bar for Total Credits */}
-      <h3>Total Credits Progress</h3>
-      <RadialBarChart
-        width={400}
-        height={300}
-        innerRadius="20%"
-        outerRadius="100%"
-        data={totalCreditsData}
-        startAngle={180}
-        endAngle={0}
-      >
-        <RadialBar minAngle={15} background dataKey="value" />
-        <Tooltip />
-        <Legend />
-      </RadialBarChart>
-    </div>
-  );
+  return null;
 };
 
 export default ProgressChart;

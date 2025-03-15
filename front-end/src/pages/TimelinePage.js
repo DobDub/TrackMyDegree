@@ -1299,13 +1299,13 @@ const calculateTotalCreditsProgress = () => {
       {calculatePoolProgress().map((pool, index) => (
         <div key={index} className="chart-container">
           <h6>{pool.poolName}</h6>
-          <PieChart width={300} height={200}>
+          <PieChart width={500} height={200}>
             <Pie
               data={pool.data}
               cx="50%"
               cy="50%"
-              innerRadius={40}
-              outerRadius={80}
+              innerRadius={120}
+              outerRadius={250}
               fill="#8884d8"
               dataKey="value"
               labelLine={true}
@@ -1332,7 +1332,7 @@ const calculateTotalCreditsProgress = () => {
             </Pie>
             <Tooltip formatter={(value, name) => `${name}: ${value} credits`} />
           </PieChart>
-          <p>Completed: {pool.data[0].value} / {pool.maxCredits} credits</p>
+          <p>{pool.data[0].value} / {pool.maxCredits} credits</p>
         </div>
       ))}
     </div>
