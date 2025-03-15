@@ -222,6 +222,9 @@ const TimelinePage = ({
   const [hasUnmetPrerequisites, setHasUnmetPrerequisites] = useState(false);
   const [totalCredits, setTotalCredits] = useState(0);
 
+  // Added showInsights state
+  const [showInsights, setShowInsights] = useState(false);
+
   // Add semester form state
   const [selectedSeason, setSelectedSeason] = useState("Fall");
   const [selectedYear, setSelectedYear] = useState("2025");
