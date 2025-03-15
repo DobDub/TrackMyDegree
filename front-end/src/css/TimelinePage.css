@@ -671,3 +671,168 @@
 .hidden-course {
   display: none;
 }
+
+
+.insights-section {
+  max-width: 100%;
+  padding: 1rem;
+  box-sizing: border-box;
+  display: block; /* Ensure normal document flow */
+  max-height: 70vh; /* Limit height to 70% of viewport height */
+  overflow-y: auto; /* Enable vertical scrolling when content exceeds max-height */
+  background-color: #f9f9f9; /* Optional: Add a background for visual clarity */
+}
+
+/* Container for course pool charts */
+.course-pool-charts-container {
+  margin-bottom: 2rem;
+  display: block; /* Ensure normal flow */
+}
+
+/* Ensure the charts wrapper grows with content and aligns properly */
+.course-pool-charts {
+  display: flex;
+  flex-wrap: wrap; /* Allow charts to wrap to new lines */
+  gap: 10rem; /* Horizontal and vertical gap between charts */
+  padding: 1rem 0;
+  justify-content: flex-start; /* Align charts to the start of each row */
+  align-items: flex-start; /* Align items at the top to prevent stretching */
+}
+
+/* Style for each chart container */
+.chart-container {
+  flex: 0 0 auto; /* Do not grow or shrink, use defined width */
+  width: 240px;
+  min-width: 240px;
+  max-width: 240px;
+  height: 450px; /* Fixed height for consistency */
+  text-align: center;
+  padding: 1rem 0;
+  position: relative;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box; /* Ensure padding doesn’t affect width/height */
+}
+
+/* Style the chart titles */
+.chart-container h6 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 4rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  flex-shrink: 0;
+}
+
+/* Ensure the PieChart fits within its container */
+.chart-container .recharts-wrapper {
+  width: 200px !important;
+  height: 200px !important;
+  max-height: 200px !important;
+  margin: 0 auto;
+  display: block;
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+/* Style the credits text below the chart */
+.chart-container p {
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  color: #555;
+  text-align: center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* Style for the Total Credits Progress chart (direct child of insights-section) */
+.insights-section > .chart-container:last-child {
+  flex: 0 0 auto; /* Do not grow or shrink */
+  width: 300px; /* Wider width for the total credits chart */
+  min-width: 300px;
+  max-width: 300px;
+  height: auto; /* Allow height to adjust to content */
+  margin: 3rem auto; /* Center it with margin */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box; /* Ensure padding doesn’t affect width/height */
+}
+
+.insights-section > .chart-container:last-child .recharts-wrapper {
+  height: 300px !important;
+  max-height: 300px !important;
+  width: 250px !important; /* Adjust width to fit within 300px container */
+  margin: 0 auto;
+}
+
+/* Optional: Style the scrollbar for insights-section */
+.insights-section::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.insights-section::-webkit-scrollbar-thumb {
+  background-color: rgba(179, 163, 163, 0.8);
+  border-radius: 15px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.insights-section::-webkit-scrollbar-thumb:hover {
+  opacity: 1;
+}
+
+.insights-section::-webkit-scrollbar-track {
+  border-radius: 10px;
+  background-color: rgba(145, 35, 56, 0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .course-pool-charts {
+    gap: 1.5rem;
+  }
+
+  .chart-container {
+    width: 220px;
+    min-width: 220px;
+    max-width: 220px;
+    height: 430px;
+  }
+
+  .chart-container h6 {
+    max-height: 4.5rem;
+  }
+
+  .chart-container .recharts-wrapper {
+    width: 200px !important;
+    height: 200px !important;
+    max-height: 200px !important;
+  }
+
+  .insights-section > .chart-container:last-child {
+    width: 250px;
+    min-width: 250px;
+    max-width: 250px;
+    margin: 2rem auto;
+  }
+
+  .insights-section > .chart-container:last-child .recharts-wrapper {
+    height: 250px !important;
+    max-height: 250px !important;
+    width: 200px !important; /* Adjust width for mobile */
+  }
+
+  .insights-section {
+    max-height: 60vh; /* Adjust for smaller screens */
+  }
+}
