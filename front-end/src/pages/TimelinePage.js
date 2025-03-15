@@ -1319,7 +1319,7 @@ const TimelinePage = ({
                  <button
                   className="toggle-insights-btn"
                   onClick={() => setShowInsights(!showInsights)}
-                  style={{ marginBottom: '1rem' }}
+                  
                 >
                   {showInsights ? 'Show Timeline' : 'Show Insights'}
                 </button>

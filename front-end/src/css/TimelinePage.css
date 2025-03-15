@@ -673,6 +673,24 @@
 }
 
 
+.toggle-insights-btn{
+  background-color: #1aa824; /* Green background */
+  color: white; /* White text */
+  border: none; /* Remove border */
+  border-radius: 5px; /* Rounded corners */
+  padding: 10px 20px; /* Padding for size */
+  margin-left: 330px;
+  font-size: 16px; /* Text size */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease; /* Smooth transition for background color */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+
+}
+
+
+
+
+
 .insights-section {
   max-width: 100%;
   padding: 1rem;
@@ -836,3 +854,4 @@
     max-height: 60vh; /* Adjust for smaller screens */
   }
 }
+
