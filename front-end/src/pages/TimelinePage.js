@@ -26,6 +26,7 @@ import warningIcon from "../icons/warning.png"; // Import warning icon
 import "../css/TimelinePage.css";
 import { groupPrerequisites } from "../utils/groupPrerequisites"; // Adjust the path as necessary
 import { useLocation } from "react-router-dom";
+import { PieChart, Pie, Cell, Legend, Tooltip } from 'recharts'; // Import recharts
 // DraggableCourse component for course list items
 const DraggableCourse = ({
   id,
@@ -872,6 +873,16 @@ const TimelinePage = ({
         maxCredits: maxCredits, // Total credits required for this pool
       };
     });
+  };
+
+  const calculateTotalCreditsProgress = () => {
+    const totalAssigned = totalCredits;
+    const totalRequired = creditsRequired + deficiencyCredits;
+  
+    return [
+      { name: 'Completed', value: totalAssigned },
+      { name: 'Remaining', value: Math.max(0, totalRequired - totalAssigned) }
+    ];
   };
 
   // Calculate total credits whenever semesterCourses changes
