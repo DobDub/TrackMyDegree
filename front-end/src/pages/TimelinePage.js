@@ -1303,6 +1303,17 @@ const TimelinePage = ({
                   Total Credits Earned: {totalCredits} /{" "}
                   {creditsRequired + deficiencyCredits}
                 </h4>
+
+                 {/* Toggle Button */}
+                 <button
+                  className="toggle-insights-btn"
+                  onClick={() => setShowInsights(!showInsights)}
+                  style={{ marginBottom: '1rem' }}
+                >
+                  {showInsights ? 'Show Timeline' : 'Show Insights'}
+                </button>
+
+
                 {/* Save Timeline Button */}
                 <button
                   className="save-timeline-button"
