@@ -52,6 +52,23 @@
   /*background-color: #f9f9f9; /* Optional: Adds background color */
 }
 
+/* Highlight entire Accordion section */
+.highlight-core .accordion-header {
+  background-color: #ffeeba; /* Light yellow highlight */
+  font-weight: bold;
+  border-left: 4px solid #ff9800; /* Orange border */
+}
+
+/* Highlight each course under Core sections */
+.highlight-course {
+  background-color: #dacdff !important;
+  border-left: 4px solid #ff9800;
+}
+
+/* Ensure highlight remains even after dragging */
+.dragging .highlight-course {
+  background-color: #dacdff !important;
+}
 
 
 .timeline-left-bar.hidden {

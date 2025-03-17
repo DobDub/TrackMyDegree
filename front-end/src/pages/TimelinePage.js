@@ -75,6 +75,7 @@ const SortableCourse = ({
   containerId,
   prerequisitesMet, // New prop
   removeButton,
+  coursePools,
 }) => {
   const {
     attributes,
@@ -97,9 +98,16 @@ const SortableCourse = ({
     transition,
   };
 
-  const className = `course-item${disabled ? ' disabled' : ''}${isDragging ? ' dragging' : ''
-    }${isDraggingFromSemester ? ' dragging-from-semester' : ''}${isSelected ? ' selected' : ''
-    }`;
+  // Check if the course belongs to a "Core" section
+  const isCoreCourse = Array.isArray(coursePools) && coursePools.some((pool) =>
+    pool.poolName.includes("Core") && Array.isArray(pool.courses) && pool.courses.some((c) => c.code === id)
+  );
+   
+
+  const className = `course-item${disabled ? ' disabled' : ''}${isDragging ? ' dragging' : ''}
+                    ${isDraggingFromSemester ? ' dragging-from-semester' : ''}
+                    ${isSelected ? ' selected' : ''}
+                    ${isCoreCourse ? ' highlight-course' : ''}`.trim();
 
   return (
     <div
@@ -1262,7 +1270,8 @@ const TimelinePage = ({ degreeid, timelineData, creditsrequired, isExtendedCredi
                                   <Accordion.Item
                                     eventKey={coursePool.poolName}
                                     key={coursePool.poolId}
-                                    className={searchQuery.trim() !== "" && !poolMatches ? "hidden-accordion" : ""}
+                                    className={`${searchQuery.trim() !== "" && !poolMatches ? "hidden-accordion" : ""} 
+                                               ${coursePool.poolName.includes("Core") ? "highlight-core" : ""}`}
                                   >
                                     <Accordion.Header>{coursePool.poolName}</Accordion.Header>
                                     <Accordion.Body>
@@ -1281,7 +1290,8 @@ const TimelinePage = ({ degreeid, timelineData, creditsrequired, isExtendedCredi
                                               isSelected={selectedCourse?.code === course.code}
                                               onSelect={handleCourseSelect}
                                               containerId="courseList"
-                                              className={!courseMatches ? "hidden-course" : ""}
+                                              className={`${!courseMatches ? "hidden-course" : ""} 
+                                                          ${coursePool.poolName.includes("Core") ? "highlight-course" : ""}`.trim()}
                                             />
                                           );
                                         })}
@@ -1410,6 +1420,11 @@ const TimelinePage = ({ degreeid, timelineData, creditsrequired, isExtendedCredi
                                   const isSelected = selectedCourse?.code === course.code;
                                   const isDraggingFromSemester = activeId === course.code;
 
+                                  // Check if the course belongs to a "Core" section
+                                  const isCoreCourse = coursePools.some((pool) =>
+                                    pool.poolName.includes("Core") && pool.courses.some((c) => c.code === course.code)
+                                  );
+
                                   // Check if prerequisites are met
                                   const prerequisitesMet = arePrerequisitesMet(course.code, index);
 
@@ -1424,6 +1439,8 @@ const TimelinePage = ({ degreeid, timelineData, creditsrequired, isExtendedCredi
                                       onSelect={handleCourseSelect}
                                       containerId={semester.id}
                                       prerequisitesMet={prerequisitesMet} // Pass the prop
+                                      coursePools={coursePools} 
+                                      className={isCoreCourse ? "highlight-course" : ""}
                                       removeButton={(
                                         <button
                                           className="remove-course-btn"
