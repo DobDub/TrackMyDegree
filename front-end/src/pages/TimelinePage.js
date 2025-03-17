@@ -148,6 +148,8 @@ const TimelinePage = ({ degreeid, timelineData, creditsrequired, isExtendedCredi
   const navigate = useNavigate();
   const [showCourseList, setShowCourseList] = useState(true);
   const [showCourseDescription, setShowCourseDescription] = useState(true);
+  const [showDeficiencyModal, setShowDeficiencyModal] = useState(false);
+  const [searchDeficiencyQuery, setSearchDeficiencyQuery] = useState('');
 
   const [semesters, setSemesters] = useState([]);
   const [semesterCourses, setSemesterCourses] = useState({});
@@ -365,38 +367,6 @@ const TimelinePage = ({ degreeid, timelineData, creditsrequired, isExtendedCredi
           const extendedData = await extendedResponse.json();
           combinedData = primaryData.concat(extendedData);
         }
-
-        if (location.state?.creditDeficiency) {
-          const deficiencyPool = {
-            poolName: 'Deficiencies',
-            poolId: 'def-pool',
-            courses: [
-              {
-                code: 'ESL202',
-                title: 'ESL 202',
-                credits: 3,
-                description: 'Deficiency course',
-                requisites: [],
-              },
-              {
-                code: 'ESL204',
-                title: 'ESL 204',
-                credits: 4,
-                description: 'Deficiency course',
-                requisites: [],
-              },
-            ],
-          };
-          if (!combinedData.find((pool) => pool.poolId === 'def-pool')) {
-            combinedData = [...combinedData, deficiencyPool];
-            const totalDefCredits = deficiencyPool.courses.reduce(
-              (sum, course) => sum + (course.credits || 0),
-              0
-            );
-            setDeficiencyCredits(totalDefCredits);
-          }
-        }
-
         setCoursePools(combinedData);
         setLoading(false);
       } catch (err) {
@@ -679,7 +649,7 @@ const TimelinePage = ({ degreeid, timelineData, creditsrequired, isExtendedCredi
     setReturning(false);
     const id = String(event.active.id);
 
-    const course = allCourses.find((c) => c.code === id);
+    const course = allCourses.find((c) => c.code === id) || deficiencyCourses.find((c) => c.code === id);
 
 
     if (course) {
@@ -898,6 +868,24 @@ const TimelinePage = ({ degreeid, timelineData, creditsrequired, isExtendedCredi
     calculateTotalCredits();
   }, [semesterCourses, semesters, coursePools, deficiencyCredits]);
 
+  const addDeficiencyCourse = (course) => {
+    setDeficiencyCourses((prev) => {
+      if (prev.some((c) => c.code === course.code)) {
+        alert("Course already added to deficiencies!");
+        return prev;
+      }
+      return [...prev, course];
+    });
+  
+    setDeficiencyCredits((prev) => prev + (course.credits || 0));
+  };
+
+  const removeDeficiencyCourse = (course) => {
+    setDeficiencyCourses((prev) => prev.filter((c) => c.code !== course.code));
+    setDeficiencyCredits((prev) => prev - (course.credits || 0));
+  };
+  
+  
 
 
   // Function to check if prerequisites and corequisites are met
@@ -1228,6 +1216,12 @@ const TimelinePage = ({ degreeid, timelineData, creditsrequired, isExtendedCredi
                 >
                   Save Timeline
                 </button>
+                <button
+                    className="add-deficiencies-button"
+                    onClick={() => setShowDeficiencyModal(true)}
+                  >
+                    Add Deficiencies
+                </button>
               </div>
 
               <div className="timeline-page">
@@ -1325,6 +1319,30 @@ const TimelinePage = ({ degreeid, timelineData, creditsrequired, isExtendedCredi
                                         />
                                       );
                                     })}
+                                  </Container>
+                                </Accordion.Body>
+                              </Accordion.Item>
+                              <Accordion.Item eventKey="deficiencies">
+                                <Accordion.Header>Deficiency Courses</Accordion.Header>
+                                <Accordion.Body>
+                                  <Container>
+                                    {deficiencyCourses.map((course) => (
+                                      <div key={course.code} className="course-item">
+                                      <DraggableCourse
+                                        id={course.code}
+                                        title={course.code}
+                                        isSelected={selectedCourse?.code === course.code}
+                                        onSelect={handleCourseSelect}
+                                        containerId="deficiencyList"
+                                      />
+                                      <button
+                                        className="remove-course-btn"
+                                        onClick={() => removeDeficiencyCourse(course)}
+                                      >
+                                        ❌
+                                      </button>
+                                    </div>
+                                    ))}
                                   </Container>
                                 </Accordion.Body>
                               </Accordion.Item>
@@ -1621,6 +1639,37 @@ const TimelinePage = ({ degreeid, timelineData, creditsrequired, isExtendedCredi
             </div>
           </div>
         )}
+        {showDeficiencyModal && (
+          <div className="modal-overlay">
+            <div className="modal-content">
+              <button className="close-button" onClick={() => setShowDeficiencyModal(false)}>✕</button>
+              <h3>Add Deficiency Courses</h3>
+              <input
+                type="text"
+                placeholder="Search courses..."
+                value={searchDeficiencyQuery}
+                onChange={(e) => setSearchDeficiencyQuery(e.target.value)}
+                className="course-search-input"
+              />
+              <div className="course-list-container">
+                {allCourses
+                  .filter(course => course.code.toLowerCase().includes(searchDeficiencyQuery.toLowerCase()))
+                  .map(course => (
+                    <div key={course.code} className="course-item">
+                      {course.code}
+                      <button
+                        className="add-course-btn"
+                        onClick={() => addDeficiencyCourse(course)}
+                      >
+                        Add
+                      </button>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+        )}
+
       </DndContext>
     </motion.div >
   );
