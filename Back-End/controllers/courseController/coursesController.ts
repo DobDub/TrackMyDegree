@@ -1,12 +1,52 @@
 import Database from "@controllers/DBController/DBController";
 import CourseTypes from "./course_types";
+import redisClient from "@controllers/redisClient";
 
 const log = console.log;
 
-// Fetch all courses
-async function getAllCourses(): Promise<CourseTypes.CourseInfo[] | undefined> {
-  const dbConn = await Database.getConnection();
+async function getFromCache(key: string): Promise<string | null> {
+  try {
+    return await redisClient.get(key);
+  } catch (err) {
+    console.error("Error getting cache:", err);
+    return null;
+  }
+}
 
+async function setCache(
+  key: string,
+  value: string,
+  ttl: number
+): Promise<void> {
+  try {
+    await redisClient.setEx(key, ttl, value);
+  } catch (err) {
+    console.error("Error setting cache:", err);
+  }
+}
+
+/**
+ * Retrieves all courses along with their requisites,
+ * using Redis caching.
+ *
+ * @returns {Promise<CourseTypes.CourseInfo[] | undefined>} - List of courses or undefined if an error occurs.
+ */
+async function getAllCourses(): Promise<CourseTypes.CourseInfo[] | undefined> {
+  const cacheKey = "getAllCourses";
+
+  // Try to fetch from cache first
+  try {
+    const cachedData = await redisClient.get(cacheKey);
+    if (cachedData) {
+      log("Serving getAllCourses from Redis cache");
+      return JSON.parse(cachedData) as CourseTypes.CourseInfo[];
+    }
+  } catch (cacheError) {
+    log("Error reading from Redis cache", cacheError);
+    // Proceed to query the database if cache fails
+  }
+
+  const dbConn = await Database.getConnection();
   if (dbConn) {
     try {
       const result = await dbConn.request().query(`
@@ -53,7 +93,16 @@ async function getAllCourses(): Promise<CourseTypes.CourseInfo[] | undefined> {
         return acc;
       }, {});
 
-      return Object.values(coursesWithRequisites);
+      const resultData = Object.values(coursesWithRequisites) as CourseTypes.CourseInfo[];
+
+      // Cache the result for 1 hour (3600 seconds)
+      try {
+        await redisClient.setEx(cacheKey, 3600, JSON.stringify(resultData));
+      } catch (cacheError) {
+        log("Error writing to Redis cache", cacheError);
+      }
+
+      return resultData;
     } catch (error) {
       log("Error fetching courses with requisites\n", error);
     }
@@ -62,7 +111,13 @@ async function getAllCourses(): Promise<CourseTypes.CourseInfo[] | undefined> {
   return undefined;
 }
 
-// Fetch a course by code
+
+/**
+ * Retrieves a specific course by its unique code.
+ *
+ * @param {string} code - The course code to search for.
+ * @returns {Promise<CourseTypes.CourseInfo | undefined>} - The course details, or undefined if not found.
+ */
 async function getCourseByCode(
   code: string
 ): Promise<CourseTypes.CourseInfo | undefined> {
@@ -113,7 +168,12 @@ async function getCourseByCode(
   return undefined;
 }
 
-// Add a new course
+/**
+ * Adds a new course to the database.
+ *
+ * @param {CourseTypes.CourseInfo} courseInfo - The course details.
+ * @returns {Promise<{ code: string } | undefined>} - The inserted course's code, or undefined on failure.
+ */
 async function addCourse(
   courseInfo: CourseTypes.CourseInfo
 ): Promise<{ code: string } | undefined> {
@@ -147,7 +207,12 @@ async function addCourse(
   return undefined;
 }
 
-// Remove a course by code
+/**
+ * Deletes a course from the database.
+ *
+ * @param {string} code - The course code to delete.
+ * @returns {Promise<boolean>} - True if deleted successfully, false otherwise.
+ */
 async function removeCourse(code: string): Promise<boolean> {
   const dbConn = await Database.getConnection();
 
@@ -168,10 +233,29 @@ async function removeCourse(code: string): Promise<boolean> {
   return false;
 }
 
-// Get courses by degree grouped into pools
+/**
+ * Retrieves courses grouped by course pools for a given degree,
+ * using Redis caching.
+ *
+ * @param {string} degreeId - The ID of the degree.
+ * @returns {Promise<CourseTypes.CoursePoolInfo[] | undefined>} - The grouped courses, or undefined on failure.
+ */
 async function getCoursesByDegreeGrouped(
   degreeId: string
 ): Promise<CourseTypes.CoursePoolInfo[] | undefined> {
+  const cacheKey = `coursesByDegreeGrouped:${degreeId}`;
+
+  try {
+    const cachedData = await redisClient.get(cacheKey);
+    if (cachedData) {
+      log("Serving getCoursesByDegreeGrouped from Redis cache");
+      return JSON.parse(cachedData) as CourseTypes.CoursePoolInfo[];
+    }
+  } catch (cacheError) {
+    log("Error reading from Redis cache", cacheError);
+    // Continue to query the database if cache read fails
+  }
+
   const dbConn = await Database.getConnection();
   if (!dbConn) return undefined;
 
@@ -224,7 +308,6 @@ async function getCoursesByDegreeGrouped(
     const coursePoolsMap: { [key: string]: CourseTypes.CoursePoolInfo } = {};
 
     records.forEach((record: any) => {
-      // Parse the JSON array of requisites
       let requisites: any[] = [];
       try {
         requisites = JSON.parse(record.requisites_json);
@@ -241,7 +324,6 @@ async function getCoursesByDegreeGrouped(
         };
       }
 
-      // Create a course object with its requisites
       const course = {
         code: record.code,
         title: record.title,
@@ -253,7 +335,16 @@ async function getCoursesByDegreeGrouped(
       coursePoolsMap[poolId].courses.push(course);
     });
 
-    return Object.values(coursePoolsMap);
+    const resultData = Object.values(coursePoolsMap);
+
+    try {
+      // Cache the result in Redis for 3600 seconds (1 hour)
+      await redisClient.setEx(cacheKey, 604800, JSON.stringify(resultData));
+    } catch (cacheError) {
+      log("Error writing to Redis cache", cacheError);
+    }
+
+    return resultData;
   } catch (error) {
     log("Error fetching courses by degree grouped by course pools\n", error);
   }
@@ -261,28 +352,44 @@ async function getCoursesByDegreeGrouped(
   return undefined;
 }
 
+/**
+ * Retrieves all courses from the database, including their requisites,
+ * using Redis caching.
+ *
+ * @returns {Promise<CourseTypes.CourseInfo[] | undefined>} - A list of courses with their requisite information, or undefined on failure.
+ */
+async function getAllCoursesInDB(): Promise<CourseTypes.CourseInfo[] | undefined> {
+  const cacheKey = "getAllCoursesInDB";
 
-async function getAllCoursesInDB(): Promise<
-  CourseTypes.CourseInfo[] | undefined
-> {
+  // Try to fetch from Redis cache first
+  try {
+    const cachedData = await redisClient.get(cacheKey);
+    if (cachedData) {
+      log("Serving getAllCoursesInDB from Redis cache");
+      return JSON.parse(cachedData) as CourseTypes.CourseInfo[];
+    }
+  } catch (cacheError) {
+    log("Error reading from Redis cache", cacheError);
+    // Continue to query the database if cache fails
+  }
+
   const dbConn = await Database.getConnection();
-
   if (dbConn) {
     try {
       const result = await dbConn.request().query(`
-                SELECT 
-                    c.code, 
-                    c.title,
-                    c.credits, 
-                    c.description,
-                    r.code1 AS requisite_code1, 
-                    r.code2 AS requisite_code2, 
-                    r.group_id AS requisite_group_id,
-                    r.type AS requisite_type
-                FROM Course c
-                LEFT JOIN Requisite r ON c.code = r.code1
-                ORDER BY c.code
-            `);
+        SELECT 
+            c.code, 
+            c.title,
+            c.credits, 
+            c.description,
+            r.code1 AS requisite_code1, 
+            r.code2 AS requisite_code2, 
+            r.group_id AS requisite_group_id,
+            r.type AS requisite_type
+        FROM Course c
+        LEFT JOIN Requisite r ON c.code = r.code1
+        ORDER BY c.code
+      `);
 
       const records = result.recordset;
       if (!records || records.length === 0) {
@@ -292,7 +399,7 @@ async function getAllCoursesInDB(): Promise<
       // Build a map keyed by course code
       const coursesMap: { [key: string]: CourseTypes.CourseInfo } = {};
 
-      records.forEach((record) => {
+      records.forEach((record: any) => {
         const courseCode = record.code;
         if (!coursesMap[courseCode]) {
           coursesMap[courseCode] = {
@@ -314,7 +421,16 @@ async function getAllCoursesInDB(): Promise<
         }
       });
 
-      return Object.values(coursesMap);
+      const resultData = Object.values(coursesMap) as CourseTypes.CourseInfo[];
+
+      // Cache the result in Redis for 1 hour (3600 seconds)
+      try {
+        await redisClient.setEx(cacheKey, 604800, JSON.stringify(resultData));
+      } catch (cacheError) {
+        log("Error writing to Redis cache", cacheError);
+      }
+
+      return resultData;
     } catch (error) {
       log("Error fetching all courses\n", error);
     }
