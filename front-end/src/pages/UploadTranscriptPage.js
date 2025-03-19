@@ -209,7 +209,7 @@ const extractTermsCoursesAndSeparators = (pagesData) => {
     "Bachelor of Engineering, Mechanical Engineering": "D8",
     "Bachelor of Engineering, Software Engineering": "D9",
   };
-  const degreeRegex = /Bachelor of [A-Za-z\s]+,\s*[A-Za-z\s]+/g; // Matches "Bachelor of Software Engineering", etc.
+  const degreeRegex = /Bachelor of [A-Za-z\s]+,\s*[A-Za-z]+\s[A-Za-z]+/g; // Matches "Bachelor of Software Engineering", etc.
   let degree = null;
   let degreeId = null;
 
@@ -218,8 +218,9 @@ const extractTermsCoursesAndSeparators = (pagesData) => {
   pagesData.forEach((pageData) => {
     const { page, text } = pageData;
 
-    if (!degree) {
-      const degreeMatch = text.match(degreeRegex);
+    const degreeMatch = text.match(degreeRegex);
+    if(!degreeId || degreeId == "Unknown")
+    {  
       if (degreeMatch) {
         degree = degreeMatch[0];
         degreeId = degreeMapping[degree];
