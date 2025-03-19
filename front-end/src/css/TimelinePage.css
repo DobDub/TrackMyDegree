@@ -45,7 +45,7 @@
 }
 
 .course-list-container-timeline {
-  max-height: 450px;  /* Adjust height as needed */
+  max-height: 350px;  /* Adjust height as needed */
   overflow-y: auto;    /* Enables vertical scrolling */
   padding-right: 10px; /* Optional: Prevent scrollbar from covering content */
   border: 1px solid #ccc;  /* Optional: Adds a border for styling */
@@ -279,7 +279,7 @@
 /* Semester Spot Styles */
 .semester-spot {
   min-width: 210px;
-  min-height: 400px;
+  min-height: 350px;
   background-color: #fdfafd;
   padding: 10px;
   border: 2px #ced4da;
