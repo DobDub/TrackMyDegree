@@ -1,6 +1,14 @@
 import React, { useEffect, useState, useRef } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Modal, Card, Col, Row, Container, Dropdown, Form } from 'react-bootstrap';
+import {
+  Modal,
+  Card,
+  Col,
+  Row,
+  Container,
+  Dropdown,
+  Form,
+} from 'react-bootstrap';
 import CourseListAccordion from '../components/CourseListAccordion';
 import { groupPrerequisites } from '../utils/groupPrerequisites';
 import '../css/CourseListPage.css';
@@ -13,7 +21,7 @@ function CourseListPage() {
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [courseList, setCourseList] = useState([]);
   const [degrees, setDegrees] = useState([]);
-  const [searchTerm, setSearchTerm] = useState(""); // New state for search input
+  const [searchTerm, setSearchTerm] = useState(''); // New state for search input
 
   const fetchController = useRef(null);
 
@@ -150,13 +158,13 @@ function CourseListPage() {
   // Filter courseList based on the search term.
   // Here, we filter each group's courses by the course title.
   const filteredCourseList = courseList
-    .map(group => ({
+    .map((group) => ({
       ...group,
-      courses: group.courses.filter(course =>
-        course.title.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      courses: group.courses.filter((course) =>
+        course.title.toLowerCase().includes(searchTerm.toLowerCase()),
+      ),
     }))
-    .filter(group => group.courses.length > 0);
+    .filter((group) => group.courses.length > 0);
 
   return (
     <motion.div
