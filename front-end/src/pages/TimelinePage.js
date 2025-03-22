@@ -1522,14 +1522,8 @@ const TimelinePage = ({
                           : 'semester-credit';
 
                         return (
-                          <div
-                            key={semester.id}
-                            className={`semester ${isExempted ? 'hidden-accordion' : ''} ${
-                              shakingSemesterId === semester.id
-                                ? 'exceeding-credit-limit'
-                                : ''
-                            }`}
-                          >
+                          <div key={semester.id} className={`semester ${isExempted } ${shakingSemesterId === semester.id ? 'exceeding-credit-limit' : ''
+                            }`}>
                             <Droppable id={semester.id} color="pink">
                               <h3>{semester.name}</h3>
                               <SortableContext
