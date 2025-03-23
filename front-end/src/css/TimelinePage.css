@@ -109,6 +109,8 @@
   height: min-content;
 }
 
+
+
 .timeline-scroll-wrapper {
   width: 100%;
   overflow-x: auto;
@@ -350,10 +352,7 @@
 /*---------------------------K R-------------------------*/
 
 /* When modal is open, blur the background (optional) */
-.timeline-container.blurred {
-  filter: blur(4px);
-  pointer-events: none;
-}
+
 
 /* ------------- Modal Overlay & Content ------------- */
 .modal-overlay {
@@ -855,3 +854,76 @@
   }
 }
 
+.custom-tooltip {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 0.75rem;
+  padding-top: 1.5rem; /* Add space for the close button */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  font-family: inherit;
+  max-width: 8rem;
+  width: auto;
+  box-sizing: border-box;
+  position: "absolute";
+  zIndex: 10;
+  text-align: center;
+}
+
+.tooltip-title {
+  margin: 0 0 0.5rem 0;
+  font-weight: bold;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.tooltip-subtitle {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #555;
+}
+
+.tooltip-course-list {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.tooltip-course-list li {
+  font-size: 0.8rem;
+  color: #333;
+  line-height: 1.2;
+  display: inline-block;
+  background-color: #f0f0f0;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+}
+
+.tooltip-empty {
+  margin: 0;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: #777;
+}
+
+.tooltip-close-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: none;
+  border: none;
+  font-size: 0.9rem;
+  color: #555;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.tooltip-close-button:hover {
+  color: #912338; /* Match the red tones in your design */
+}

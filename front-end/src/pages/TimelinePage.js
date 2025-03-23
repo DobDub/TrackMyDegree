@@ -168,6 +168,7 @@ const TimelinePage = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [isECP, setIsECP] = useState(false);
+  const [tooltipVisibility, setTooltipVisibility] = useState({});
 
   // Flatten and filter courses from all pools based on the search query
 
@@ -244,6 +245,8 @@ const TimelinePage = ({
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [timelineName, setTimelineName] = useState("");
   const [tempName, setTempName] = useState("");
+  const chartId = "total-credits";
+  const [tooltipData, setTooltipData] = useState({});
 
   let DEFAULT_EXEMPTED_COURSES = [];
   if (!extendedCredit) {
@@ -837,54 +840,138 @@ const TimelinePage = ({
 
   const ECP_EXTRA_CREDITS = 30; // Extra credits for ECP students
 
-  // Function to calculate the progress for each course pool
-  const calculatePoolProgress = () => {
-    // Map over the coursePools array to create progress data for each pool
-    return coursePools.map((pool) => {
-      // Calculate the total assigned credits for the current pool by:
-      // 1. Getting all courses from semesterCourses (an object with semester-wise courses)
-      // 2. Flattening the array of courses across all semesters into a single array
-      // 3. Mapping each course code to its credit value if it belongs to the current pool
-      // 4. Reducing the array of credits to a single sum
-      const assignedCredits = Object.values(semesterCourses) // Extract course arrays from all semesters
-        .flat() // Flatten the arrays into a single array of course codes
-        .map((cCode) => {
-          // Find the course in the current pool that matches the course code
-          const courseInPool = pool.courses.find((c) => c.code === cCode);
-          // If the course is found in the pool, return its credits; otherwise, return 0
-          return courseInPool ? courseInPool.credits : 0;
-        })
-        .reduce((sum, c) => sum + c, 0); // Sum up all the credits
+  const CustomTooltip = ({ onClose, isVisible, chartId }) => {
+    const data = tooltipData[chartId];
+  
+    if (!isVisible || !data) {
+      return null;
+    }
+  
+    const { name, value, courses } = data;
+  
+    return (
+      <div className="custom-tooltip">
+        {onClose && (
+          <button className="tooltip-close-button" onClick={onClose}>
+            ✕
+          </button>
+        )}
+        <p className="tooltip-title">{`${name}: ${value} credits`}</p>
+        {courses && courses.length > 0 ? (
+          <div>
+            <p className="tooltip-subtitle">Courses:</p>
+            <ul className="tooltip-course-list">
+              {courses.map((course, index) => (
+                <li key={index}>{course}</li>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          <p className="tooltip-empty">No courses</p>
+        )}
+      </div>
+    );
+  };
 
-      // Extract the maximum credits for the pool from its name (e.g., "Pool Name (24 credits)")
-      const maxCredits = parseMaxCreditsFromPoolName(pool.poolName);
-
-      // Calculate remaining credits by subtracting assigned credits from max credits
-      // Use Math.max(0, ...) to ensure remaining credits don't go negative
-      const remainingCredits = Math.max(0, maxCredits - assignedCredits);
-
-      // Return an object for the current pool with its name, progress data, and max credits
-      return {
-        poolName: pool.poolName, // The name of the pool (e.g., "AERO - Engineering Core")
-        data: [
-          { name: "Completed", value: assignedCredits }, // Credits already assigned to this pool
-          { name: "Remaining", value: remainingCredits }, // Credits still needed to complete the pool
-        ],
-        maxCredits: maxCredits, // Total credits required for this pool
-      };
+  const toggleTooltipVisibility = (chartId, segment, visible, data) => {
+    console.log(`Toggling visibility for chartId: ${chartId}, segment: ${segment}, visible: ${visible}`);
+    setTooltipVisibility((prev) => {
+      const newState = { ...prev };
+      if (visible) {
+        newState[chartId] = { segment, visible: true };
+        setTooltipData((prev) => ({
+          ...prev,
+          [chartId]: data,
+        }));
+      } else {
+        newState[chartId] = { segment: null, visible: false };
+        setTooltipData((prev) => {
+          const newData = { ...prev };
+          delete newData[chartId];
+          return newData;
+        });
+      }
+      console.log("New tooltipVisibility state:", newState);
+      return newState;
     });
   };
-
-  const calculateTotalCreditsProgress = () => {
-    const totalAssigned = totalCredits;
-    const totalRequired = creditsRequired + deficiencyCredits;
   
-    return [
-      { name: 'Completed', value: totalAssigned },
-      { name: 'Remaining', value: Math.max(0, totalRequired - totalAssigned) }
-    ];
-  };
+  // Function to calculate the progress for each course pool
+const calculatePoolProgress = () => {
+  return coursePools.map((pool) => {
+    // Get all assigned courses across all semesters
+    const assignedCourses = Object.values(semesterCourses)
+      .flat()
+      .filter((cCode) => pool.courses.some((c) => c.code === cCode));
 
+    // Calculate assigned credits
+    const assignedCredits = assignedCourses
+      .map((cCode) => {
+        const courseInPool = pool.courses.find((c) => c.code === cCode);
+        return courseInPool ? courseInPool.credits : 0;
+      })
+      .reduce((sum, c) => sum + c, 0);
+
+    // Extract the maximum credits for the pool from its name
+    const maxCredits = parseMaxCreditsFromPoolName(pool.poolName);
+    const remainingCredits = Math.max(0, maxCredits - assignedCredits);
+
+    // Get the list of remaining courses (those in the pool that haven't been assigned)
+    const remainingCoursesInPool = pool.courses
+      .filter((course) => !assignedCourses.includes(course.code))
+      .map((course) => course.code);
+
+    return {
+      poolName: pool.poolName,
+      data: [
+        {
+          name: "Completed",
+          value: assignedCredits,
+          courses: assignedCourses, // Add the list of completed courses
+        },
+        {
+          name: "Remaining",
+          value: remainingCredits,
+          courses: remainingCoursesInPool, // Add the list of remaining courses
+        },
+      ],
+      maxCredits: maxCredits,
+    };
+  });
+};
+
+const calculateTotalCreditsProgress = () => {
+  const totalAssigned = totalCredits;
+  const totalRequired = creditsRequired + deficiencyCredits;
+
+  // Get all assigned courses across all semesters (excluding "Exempted")
+  const assignedCourses = Object.keys(semesterCourses)
+    .filter((semesterId) => semesterId.toLowerCase() !== "exempted")
+    .flatMap((semesterId) => semesterCourses[semesterId]);
+
+  // Get all courses from all pools
+  const allPoolCourses = coursePools.flatMap((pool) =>
+    pool.courses.map((course) => course.code)
+  );
+
+  // Remaining courses are those in the pools that haven't been assigned
+  const remainingCourses = allPoolCourses.filter(
+    (courseCode) => !assignedCourses.includes(courseCode)
+  );
+
+  return [
+    {
+      name: "Completed",
+      value: totalAssigned,
+      courses: assignedCourses, // Add the list of completed courses
+    },
+    {
+      name: "Remaining",
+      value: Math.max(0, totalRequired - totalAssigned),
+      courses: remainingCourses, // Add the list of remaining courses
+    },
+  ];
+};
   // Calculate total credits whenever semesterCourses changes
   useEffect(() => {
     const calculateTotalCredits = () => {
@@ -1288,7 +1375,7 @@ const TimelinePage = ({
         sensors={sensors}
         collisionDetection={closestCorners}
         onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
+        onDragEnd={handleDragEnd}﻿
         onDragCancel={handleDragCancel}
       >
         {/* We blur the background content when modal is open */}
@@ -1344,79 +1431,109 @@ const TimelinePage = ({
 
                 
 
-{showInsights ? (
-<div className="insights-section">
-<h2>Progress Insights</h2>
-<hr style={{ marginBottom: '1rem' }} />
+          {showInsights ? (
+          <div className="insights-section">
+          <h2>Progress Insights</h2>
+          <hr style={{ marginBottom: '1rem' }} />
 
-{/* Course Pool Progress Charts */}
-<h5>Course Pool Progress</h5>
-<div className="course-pool-charts">
-{calculatePoolProgress().map((pool, index) => (
-<div key={index} className="chart-container">
-<h6>{pool.poolName}</h6>
-<PieChart width={500} height={200}>
-<Pie
-data={pool.data}
-cx="50%"
-cy="50%"
-innerRadius={120}
-outerRadius={250}
-fill="#8884d8"
-dataKey="value"
-labelLine={true}
-label={({ percent, cx, cy, midAngle, outerRadius }) => {
-  const RADIAN = Math.PI / 180;
-  const radius = outerRadius + 20;
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
-  return (
-    <text
-      x={x}
-      y={y}
-      fill="#333"
-      textAnchor={x > cx ? 'start' : 'end'}
-      dominantBaseline="central"
-    >
-      {`${(percent * 100).toFixed(0)}%`}
-    </text>
-  );
-}}
->
-<Cell key="completed" fill="#4a90e2" />
-<Cell key="remaining" fill="#d3d3d3" />
-</Pie>
-<Tooltip formatter={(value, name) => `${name}: ${value} credits`} />
-</PieChart>
-<p>{pool.data[0].value} / {pool.maxCredits} credits</p>
-</div>
-))}
+          {/* Course Pool Progress Charts */}
+          <h5>Course Pool Progress</h5>
+          <div className="course-pool-charts">
+          {calculatePoolProgress().map((pool, index) => {
+    const chartId = `pool-${index}`;
+    const isTooltipVisible = tooltipVisibility[chartId]?.visible !== false;
+    return (
+      <div key={index} className="chart-container">
+        <h6>{pool.poolName}</h6>
+        <PieChart width={500} height={200}>
+          <Pie
+            data={pool.data}
+            cx="50%"
+            cy="50%"
+            innerRadius={120}
+            outerRadius={250}
+            fill="#8884d8"
+            dataKey="value"
+            labelLine={true}
+            label={({ percent, cx, cy, midAngle, outerRadius }) => {
+              const RADIAN = Math.PI / 180;
+              const radius = outerRadius + 20;
+              const x = cx + radius * Math.cos(-midAngle * RADIAN);
+              const y = cy + radius * Math.sin(-midAngle * RADIAN);
+              return (
+                <text
+                  x={x}
+                  y={y}
+                  fill="#333"
+                  textAnchor={x > cx ? "start" : "end"}
+                  dominantBaseline="central"
+                >
+                  {`${(percent * 100).toFixed(0)}%`}
+                </text>
+              );
+            }}
+            isAnimationActive={false}
+          >
+            <Cell
+              key="completed"
+              fill="#4a90e2"
+              onMouseEnter={() => toggleTooltipVisibility(chartId, "completed", true)}
+            />
+            <Cell
+              key="remaining"
+              fill="#d3d3d3"
+              onMouseEnter={() => toggleTooltipVisibility(chartId, "remaining", true)}
+            />
+          </Pie>
+          <Tooltip
+            content={
+              <CustomTooltip
+                onClose={() => toggleTooltipVisibility(chartId, null, false)}
+                isVisible={isTooltipVisible}
+                chartId={chartId} // Pass chartId to CustomTooltip
+              />
+            }
+            isAnimationActive={true}
+            wrapperStyle={{
+              position: "absolute",
+              top: "20%",
+              left: "100%",
+              transform: "translateY(-20%)",
+              marginLeft: "1rem",
+              zIndex: 10,
+            }}
+          />
+        </PieChart>
+        <p>{pool.data[0].value} / {pool.maxCredits} credits</p>
+      </div>
+    );
+  })}
 </div>
 
-{/* Total Credits Progress Chart */}
-<div className="chart-container">
-<h5>Total Credits Progress</h5>
-<PieChart width={300} height={300}>
-<Pie
-data={calculateTotalCreditsProgress()}
-cx="50%"
-cy="50%"
-labelLine={false}
-label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-outerRadius={120}
-fill="#82ca9d"
-dataKey="value"
->
-{calculateTotalCreditsProgress().map((entry, index) => (
-<Cell key={`cell-${index}`} fill={index === 0 ? "#82ca9d" : "#d3d3d3"} />
-))}
-</Pie>
-<Tooltip />
-<Legend />
-</PieChart>
-</div>
-</div>
-) : (
+          {/* Total Credits Progress Chart */}
+          <div className="chart-container">
+          <h5>Total Credits Progress</h5>
+          <PieChart width={300} height={300}>
+          <Pie
+          data={calculateTotalCreditsProgress()}
+          cx="50%"
+          cy="50%"
+          labelLine={false}
+          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+          outerRadius={120}
+          fill="#82ca9d"
+          dataKey="value"
+          >
+          {calculateTotalCreditsProgress().map((entry, index) => (
+          <Cell key={`cell-${index}`} fill={index === 0 ? "#82ca9d" : "#d3d3d3"} />
+          ))}
+          </Pie>
+          <Tooltip />
+          <Legend />
+          </PieChart>
+          </div>
+          </div>
+          ) : (
     // Timeline Section
     <>
       <Droppable className='courses-with-button' id="courses-with-button">
