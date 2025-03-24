@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
+from bs4.dammit import EncodingDetector
 import json
 import requests
+import re
 
 # URL of the Concordia Computer Science courses page
 

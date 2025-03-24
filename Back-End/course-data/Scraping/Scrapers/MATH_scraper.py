@@ -1,7 +1,8 @@
 from bs4 import BeautifulSoup
+from bs4.dammit import EncodingDetector
 import json
 import requests
-
+import re
 # Updated URL
 url = (
     "https://www.concordia.ca/academics/undergraduate/calendar/current/"
