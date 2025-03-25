@@ -169,6 +169,7 @@ const TimelinePage = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [isECP, setIsECP] = useState(false);
   const [tooltipVisibility, setTooltipVisibility] = useState({});
+  const [activeTooltip, setActiveTooltip] = useState(null);
 
   // Flatten and filter courses from all pools based on the search query
 
@@ -245,8 +246,9 @@ const TimelinePage = ({
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [timelineName, setTimelineName] = useState("");
   const [tempName, setTempName] = useState("");
-  const chartId = "total-credits";
   const [tooltipData, setTooltipData] = useState({});
+  const [permanentLabelsVisible, setPermanentLabelsVisible] = useState(true);
+  const [animationActive, setAnimationActive] = useState(true);
 
   let DEFAULT_EXEMPTED_COURSES = [];
   if (!extendedCredit) {
@@ -263,6 +265,14 @@ const TimelinePage = ({
   } else {
     DEFAULT_EXEMPTED_COURSES = ["MATH201", "MATH206"];
   }
+
+  useEffect(() => {
+    setAnimationActive(true);
+    const timer = setTimeout(() => {
+      setAnimationActive(false);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [showInsights]);
 
   // NEW: Fetch all courses from /courses/getAllCourses
   useEffect(() => {
@@ -840,30 +850,42 @@ const TimelinePage = ({
 
   const ECP_EXTRA_CREDITS = 30; // Extra credits for ECP students
 
-  const CustomTooltip = ({ onClose, isVisible, chartId }) => {
-    const data = tooltipData[chartId];
+  const CustomTooltip = ({ onClose, isVisible, chartId, data }) => {
+    const [visibleCourses, setVisibleCourses] = useState(20);
+    
+    if (!isVisible || !data) return null;
   
-    if (!isVisible || !data) {
-      return null;
-    }
-  
-    const { name, value, courses } = data;
+    const { name, value, courses = [] } = data;
+    const hasMoreCourses = courses.length > visibleCourses;
+    const displayedCourses = courses.slice(0, visibleCourses);
   
     return (
-      <div className="custom-tooltip">
-        {onClose && (
-          <button className="tooltip-close-button" onClick={onClose}>
-            ✕
-          </button>
-        )}
+      <div 
+        className="custom-tooltip"
+        onClick={(e) => e.stopPropagation()} // Prevent clicks from reaching the chart
+      >
+        <button className="tooltip-close-button" onClick={onClose}>
+          ✕
+        </button>
         <p className="tooltip-title">{`${name}: ${value} credits`}</p>
-        {courses && courses.length > 0 ? (
+        {courses.length > 0 ? (
           <div>
             <p className="tooltip-subtitle">Courses:</p>
             <ul className="tooltip-course-list">
-              {courses.map((course, index) => (
+              {displayedCourses.map((course, index) => (
                 <li key={index}>{course}</li>
               ))}
+              {hasMoreCourses && (
+                <li className="tooltip-more-indicator">
+                  ...and {courses.length - visibleCourses} more
+                  <button 
+                    className="tooltip-load-more" 
+                    onClick={() => setVisibleCourses(prev => prev + 20)}
+                  >
+                    Load More
+                  </button>
+                </li>
+              )}
             </ul>
           </div>
         ) : (
@@ -872,28 +894,27 @@ const TimelinePage = ({
       </div>
     );
   };
-
+  
   const toggleTooltipVisibility = (chartId, segment, visible, data) => {
-    console.log(`Toggling visibility for chartId: ${chartId}, segment: ${segment}, visible: ${visible}`);
-    setTooltipVisibility((prev) => {
-      const newState = { ...prev };
-      if (visible) {
-        newState[chartId] = { segment, visible: true };
-        setTooltipData((prev) => ({
-          ...prev,
-          [chartId]: data,
-        }));
-      } else {
-        newState[chartId] = { segment: null, visible: false };
-        setTooltipData((prev) => {
-          const newData = { ...prev };
-          delete newData[chartId];
-          return newData;
-        });
-      }
-      console.log("New tooltipVisibility state:", newState);
-      return newState;
-    });
+    // If manually closing (visible is false and no data)
+    if (visible === false && !data) {
+      setTooltipVisibility(prev => ({
+        ...prev,
+        [chartId]: { visible: false }
+      }));
+      return;
+    }
+  
+    // If opening or updating
+    setTooltipVisibility(prev => ({
+      ...prev,
+      [chartId]: { segment, visible: true }
+    }));
+    
+    setTooltipData(prev => ({
+      ...prev,
+      [chartId]: data
+    }));
   };
   
   // Function to calculate the progress for each course pool
@@ -1427,89 +1448,113 @@ const calculateTotalCreditsProgress = () => {
               </div>
 
               
+
+              
               <div className="timeline-page">
 
                 
 
-          {showInsights ? (
-          <div className="insights-section">
-          <h2>Progress Insights</h2>
-          <hr style={{ marginBottom: '1rem' }} />
+              {showInsights ? (
+  <div className="insights-section">
+    <h2>Progress Insights</h2>
+    <hr style={{ marginBottom: '1rem' }} />
 
-          {/* Course Pool Progress Charts */}
-          <h5>Course Pool Progress</h5>
-          <div className="course-pool-charts">
-          {calculatePoolProgress().map((pool, index) => {
-    const chartId = `pool-${index}`;
-    const isTooltipVisible = tooltipVisibility[chartId]?.visible !== false;
-    return (
-      <div key={index} className="chart-container">
-        <h6>{pool.poolName}</h6>
-        <PieChart width={500} height={200}>
-          <Pie
-            data={pool.data}
-            cx="50%"
-            cy="50%"
-            innerRadius={120}
-            outerRadius={250}
-            fill="#8884d8"
-            dataKey="value"
-            labelLine={true}
-            label={({ percent, cx, cy, midAngle, outerRadius }) => {
-              const RADIAN = Math.PI / 180;
-              const radius = outerRadius + 20;
-              const x = cx + radius * Math.cos(-midAngle * RADIAN);
-              const y = cy + radius * Math.sin(-midAngle * RADIAN);
-              return (
-                <text
-                  x={x}
-                  y={y}
-                  fill="#333"
-                  textAnchor={x > cx ? "start" : "end"}
-                  dominantBaseline="central"
-                >
-                  {`${(percent * 100).toFixed(0)}%`}
-                </text>
-              );
-            }}
-            isAnimationActive={false}
-          >
-            <Cell
-              key="completed"
-              fill="#4a90e2"
-              onMouseEnter={() => toggleTooltipVisibility(chartId, "completed", true)}
-            />
-            <Cell
-              key="remaining"
-              fill="#d3d3d3"
-              onMouseEnter={() => toggleTooltipVisibility(chartId, "remaining", true)}
-            />
-          </Pie>
-          <Tooltip
-            content={
-              <CustomTooltip
-                onClose={() => toggleTooltipVisibility(chartId, null, false)}
-                isVisible={isTooltipVisible}
-                chartId={chartId} // Pass chartId to CustomTooltip
-              />
-            }
-            isAnimationActive={true}
-            wrapperStyle={{
-              position: "absolute",
-              top: "20%",
-              left: "100%",
-              transform: "translateY(-20%)",
-              marginLeft: "1rem",
-              zIndex: 10,
-            }}
-          />
-        </PieChart>
-        <p>{pool.data[0].value} / {pool.maxCredits} credits</p>
-      </div>
-    );
-  })}
-</div>
+    {/* Course Pool Progress Charts */}
+    <h5>Course Pool Progress</h5>
+    <div className="course-pool-charts">
+      {calculatePoolProgress().map((pool, index) => {
+        const chartId = `pool-${index}`;
+        const isTooltipVisible = activeTooltip === chartId;
+        const currentTooltipData = tooltipData[chartId];
 
+        
+
+        return (
+          
+          <div key={index} className="chart-container" style={{ minWidth: '250px' }}>
+            <h6>{pool.poolName}</h6>
+            <PieChart width={500} height={200} margin={{ right: 50, left: 20 }}>
+              
+              
+              {/* The actual pie chart without interactive labels */}
+              <Pie
+                data={pool.data}
+                cx="50%"
+                cy="50%"
+                innerRadius={120}
+                outerRadius={250}
+               
+                fill="#8884d8"
+                dataKey="value"
+                labelLine={false}
+                label={(props) => {
+                  const { cx, cy, midAngle, innerRadius, outerRadius, value } = props;
+                  const RADIAN = Math.PI / 180;
+                  // Place text halfway between inner & outer radius
+                  const radius = 260;
+                  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+              
+                  // Calculate the percentage of maxCredits if needed
+                  const percent = (value / pool.maxCredits) * 100;
+              
+                  return (
+                    <text
+                      x={x}
+                      y={y}
+                      fill="#333"
+                      textAnchor={x > cx ? "start" : "end"}
+                      dominantBaseline="central"
+                      style={{ fontSize: '35px', fontWeight: 'bold' }}
+                    >
+                      {`${percent.toFixed(0)}%`}
+                    </text>
+                  );
+                }} 
+                isAnimationActive={animationActive}
+                isUpdateAnimationActive={false}
+                
+
+            >
+                
+
+        {pool.data.map((entry, idx) => (
+        <Cell
+          key={`cell-${idx}`}
+          fill={entry.name === "Completed" ? "#4a90e2" : "#d3d3d3"}
+          onMouseEnter={() => {
+            toggleTooltipVisibility(chartId, entry.name, true, {
+              name: entry.name,
+              value: entry.value,
+              courses: entry.courses,
+            });
+            setActiveTooltip(chartId);
+          }}
+          onMouseLeave={() => {}}
+        />
+      ))}
+    </Pie>
+            </PieChart>
+            
+            {isTooltipVisible && (
+              <div className="tooltip-wrapper">
+                <CustomTooltip
+                  onClose={() => {
+                    toggleTooltipVisibility(chartId, null, false, null);
+                    setActiveTooltip(null);
+                  }}
+                  isVisible={isTooltipVisible}
+                  chartId={chartId}
+                  data={currentTooltipData}
+                />
+              </div>
+            )}
+            
+            <p>{pool.data[0].value} / {pool.maxCredits} credits</p>
+          </div>
+        );
+      })}
+    </div>
           {/* Total Credits Progress Chart */}
           <div className="chart-container">
           <h5>Total Credits Progress</h5>
