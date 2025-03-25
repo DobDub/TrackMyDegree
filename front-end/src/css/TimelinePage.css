@@ -687,9 +687,6 @@
 }
 
 
-
-
-
 .insights-section {
   max-width: 100%;
   padding: 1rem;
@@ -719,9 +716,9 @@
 /* Style for each chart container */
 .chart-container {
   flex: 0 0 auto; /* Do not grow or shrink, use defined width */
-  width: 240px;
+  width: 300px;
   min-width: 240px;
-  max-width: 240px;
+  max-width: 400px;
   height: 450px; /* Fixed height for consistency */
   text-align: center;
   padding: 1rem 0;
@@ -859,14 +856,13 @@
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 0.75rem;
-  padding-top: 1.5rem; /* Add space for the close button */
+  padding-top: 1.5rem;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   font-family: inherit;
-  max-width: 8rem;
+  max-width: 200px;
   width: auto;
   box-sizing: border-box;
-  position: "absolute";
-  zIndex: 10;
+  z-index: 10;
   text-align: center;
 }
 
@@ -892,14 +888,17 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: center;
+  max-height: 300px; /* Optional: Limit height to prevent overly large tooltips */
+  overflow-y: auto; /* Add scrolling if needed */
 }
 
 .tooltip-course-list li {
   font-size: 0.8rem;
-  color: #333;
+  font-weight: bold;
+  color: white;
   line-height: 1.2;
   display: inline-block;
-  background-color: #f0f0f0;
+  background-color: #912338;
   padding: 0.2rem 0.5rem;
   border-radius: 3px;
 }
@@ -926,4 +925,68 @@
 
 .tooltip-close-button:hover {
   color: #912338; /* Match the red tones in your design */
+}
+
+
+.tooltip-more-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-style: italic;
+  color: #777;
+}
+
+.tooltip-load-more {
+  background: none;
+  border: none;
+  color: #4a90e2; /* Match your "Completed" color or adjust as needed */
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.8rem;
+  text-decoration: underline;
+}
+
+.tooltip-load-more:hover {
+  color: #357abd; /* Darker shade on hover */
+}
+
+.tooltip-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 100%; /* Position to the right of the pie chart */
+  transform: translateY(-50%);
+  margin-left: 1rem;
+  z-index: 10;
+}
+
+.tooltip-course-list.expanded {
+  max-height: 200px; /* Adjust as needed */
+  overflow-y: auto; /* Enable scrolling when expanded */
+}
+
+.tooltip-course-list.expanded::-webkit-scrollbar {
+  width: 5px;
+}
+
+.tooltip-course-list.expanded::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 5px;
+}
+
+.tooltip-course-list.expanded::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+}
+
+.recharts-surface {
+  overflow: visible !important;
+}
+
+.recharts-pie-label {
+  opacity: 1 !important;
+  transition: none !important;
+}
+
+recharts-pie-label text {
+  dominant-baseline: middle !important;
+  text-anchor: middle !important;
 }
