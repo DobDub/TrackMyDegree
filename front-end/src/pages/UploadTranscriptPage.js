@@ -8,8 +8,9 @@ import TransImage from '../images/Transc_image.png';
 import Button from 'react-bootstrap/Button';
 import { motion } from 'framer-motion';
 
+
 // Set the worker source
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
 
 const UploadTranscript = ({ onDataProcessed }) => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -241,7 +242,6 @@ const extractTermsCoursesAndSeparators = (pagesData) => {
   let transcript = false;
   pagesData.forEach((pageData) => {
     const { page, text } = pageData;
-
     const degreeMatch = text.match(degreeRegex);
     if(!degreeId || degreeId == "Unknown")
     {  
@@ -250,6 +250,7 @@ const extractTermsCoursesAndSeparators = (pagesData) => {
         degreeId = degreeMapping[degree];
       }
     }
+
     // Check if text contains "OFFER OF ADMISSION"
     if (text.match("Student Record")) {
       transcript = true;
@@ -306,6 +307,7 @@ const extractTermsCoursesAndSeparators = (pagesData) => {
       console.log('Exempted Course:', exemptedMatch[1] + exemptedMatch[2]);
     }
   });
+
   if(!transcript){
     alert("Please choose Offer of Admission");     
     return { results: [] };
