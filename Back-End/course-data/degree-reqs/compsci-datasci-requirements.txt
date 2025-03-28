@@ -1,0 +1,5 @@
+DegreeID=CompSci
+DegreeName=B
+TotalCredits=90
+
+

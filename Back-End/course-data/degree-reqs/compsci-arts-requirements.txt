@@ -1,0 +1,65 @@
+DegreeID=CompSci
+DegreeName=BCompSc Computation Arts
+TotalCredits=90
+
+
+
+[Computer Science Core (33 credits)]
+COMP 228
+COMP 232
+COMP 233
+COMP 248
+COMP 249
+COMP 335
+COMP 346
+COMP 348
+COMP 352
+COMP 354
+
+
+[Comp Arts Core FFAR (6 credits)]
+FFAR 248
+FFAR 249
+
+
+
+[Comp Arts Core CART (6 credits)]
+CART 210
+CART 211
+CART 212
+CART 214
+
+[Comp Arts Core CART 310 (3 credits)]
+CART 310
+
+
+[Comp Arts Core 300-level CART courses (6 credits)]
+
+
+
+[Comp Arts Capstone (3 credits)]
+CART 470
+
+
+[400-level CART courses (9 credits)]
+
+
+
+
+[DART courses or other Fine Arts Electives (6 credits)]
+
+
+
+[Other required courses (12 credits)]
+COMP 345
+COMP 371
+ENCS 282
+ENGR 411
+
+
+
+
+
+
+
+
