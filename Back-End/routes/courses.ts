@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import courseController from "@controllers/courseController/courseController";
+import courseController from "@controllers/courseController/coursesController";
 import CourseTypes from "@controllers/courseController/course_types";
 import HTTP from "@Util/HTTPCodes";
 
@@ -55,14 +55,7 @@ router.post("/remove", async (req: Request, res: Response) => {
 router.post("/add", async (req: Request, res: Response) => {
   const courseInfo: CourseTypes.CourseInfo = req.body;
 
-  const courseInfoCorrect =
-    courseInfo.code &&
-    courseInfo.credits &&
-    courseInfo.offeredIn &&
-    courseInfo.description &&
-    courseInfo.title;
-
-  if (!courseInfo || !courseInfoCorrect) {
+  if (!courseInfo) {
     res.status(HTTP.BAD_REQUEST).json({ error: "Course data is required" });
     return;
   }

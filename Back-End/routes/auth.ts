@@ -9,7 +9,6 @@ import { UserHeaders } from '@Util/Session_Util';
 
 dotenv.config();
 
-
 const router = express.Router();
 var salt = bcrypt.genSaltSync(10);
 
@@ -59,15 +58,11 @@ router.post('/login', async (req: Request, res: Response) => {
 // Sign-up
 router.post('/signup', async (req: Request, res: Response) => {
   if (!req.body) {
-  const payload: Auth.UserInfo = req.body;
-
-  if (Object.keys(payload).length === 0) {
     res
       .status(HTTP.BAD_REQUEST)
       .json({ error: 'Request body cannot be empty' });
     return; // Exit if validation fails
   }
-
 
   const payload: Auth.UserInfo = req.body;
 
@@ -83,7 +78,6 @@ router.post('/signup', async (req: Request, res: Response) => {
   } catch (error) {
     const errMsg = 'Internal server error in /signup';
     console.error(errMsg, error);
-
     res.status(HTTP.SERVER_ERR).json({ error: errMsg });
   }
 });
@@ -110,7 +104,6 @@ router.post('/forgot-password', async (req: Request, res: Response) => {
   } catch (error) {
     const errMsg = 'Internal server error in /forgot-password';
     console.error(errMsg, error);
-
     res.status(HTTP.SERVER_ERR).json({ error: errMsg });
   }
 });

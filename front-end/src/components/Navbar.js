@@ -1,6 +1,6 @@
 // src/components/Navbar.js
 import React, { useContext, useEffect, useRef } from 'react';
-import { useNavigate,  NavLink , Link, useLocation} from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { AuthContext } from '../middleware/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -12,9 +12,6 @@ const Navbar = () => {
 	const { isLoggedIn, loading, logout, user } = useContext(AuthContext);
 	const navigate = useNavigate();
 	const menuRef = useRef(null);
-  const location = useLocation();
-  const timelineActivePaths = ['/timeline_initial', '/timeline_change', '/uploadTranscript'];
-
 
   // Handle logout logic
   const handleLogout = () => {
@@ -77,45 +74,16 @@ const Navbar = () => {
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-          {/* Close button for mobile collapse */}
-          <button className="close-nav" onClick={toggleMenu}>
-            &times;
-          </button>
-          <div className="mobile-feedback">
-            <Link
-              onClick={() =>
-                window.open(
-                  'https://docs.google.com/forms/d/e/1FAIpQLScr67TcEpPV1wNCTM5H53hPwRgplAvkYmxg72LKgHihCSmzKg/viewform',
-                  '_blank'
-                )
-              }
-            >
-              <button className="feedback-button-mobile">
-                Submit Feedback!
-              </button>
-            </Link>
-          </div>
           <div className="navbar-nav custom-nav-links">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                "nav-link" + (isActive ? " active" : "")
-              }
-            >
+            <Link className="nav-link active" aria-current="page" to="/">
               Home
-            </NavLink>
-            <NavLink
-              to="/timeline_initial"
-              className={() => "nav-link" + (timelineActivePaths.includes(location.pathname) ? " active" : "")}
-            >
+            </Link>
+            <p className={'nav-separator'}>|</p>
+            <Link className="nav-link" to="/timeline_initial">
               Timeline
-            </NavLink>
-            <NavLink
-              to="/courselist"
-              className={({ isActive }) =>
-                "nav-link" + (isActive ? " active" : "")
-              }
-            >
+            </Link>
+            <p className={'nav-separator'}>|</p>
+            <Link className="nav-link" to="/courselist">
               Courses
             </Link>
             {(user && user.type === 'admin') ? 
@@ -127,8 +95,6 @@ const Navbar = () => {
               </Link>
               </>
             ) : '' }
-            </NavLink>
-
           </div>
           {!loading ? (
             <>

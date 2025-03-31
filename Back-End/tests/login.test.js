@@ -9,10 +9,8 @@ jest.mock('../dist/controllers/authController/authController', () => ({
 const request = require('supertest');
 const express = require('express');
 const router = require('../dist/routes/auth').default;
-const authController =
+const controller =
   require('../dist/controllers/authController/authController').default;
-
-const mockDBRecord = require('./__mocks__/user_mocks').mockDBRecord;
 
 const url = process.DOCKER_URL || 'host.docker.internal:8000';
 
@@ -22,7 +20,16 @@ app.use('/auth', router);
 
 describe('POST /auth/login', () => {
   it('should return a successful login message and token', async () => {
-    authController.authenticate.mockResolvedValueOnce(mockDBRecord);
+    const mockDBRecord = {
+      id: 'random uuid',
+      email: 'example@example.com',
+      password: 'Hashed password',
+      fullname: 'Random User',
+      type: 'student',
+    };
+
+    controller.authenticate.mockResolvedValue(mockDBRecord);
+
     const response = await request(app)
       .post('/auth/login')
       .send({
@@ -41,12 +48,11 @@ describe('POST /auth/login', () => {
 
   // Wrong field request
   it('should return 401 status and error message when password is incorrect', async () => {
-    authController.authenticate.mockResolvedValueOnce(undefined);
-    const response = await request(app)
+    const response = await request(url)
       .post('/auth/login')
       .send({
         email: 'example@example.com',
-        password: 'adsadhsa',
+        password: 'wrongpass',
       })
       .expect('Content-Type', /json/)
       .expect(401);
@@ -57,9 +63,9 @@ describe('POST /auth/login', () => {
     );
   });
 
-  // Bad request, missing fields
+  // Bad request, nissing fields
   it('should return 400 status and error message when the body is incorrect', async () => {
-    const response = await request(app)
+    const response = await request(url)
       .post('/auth/login')
       .send({
         email: 'example@example.com', // missing password field
